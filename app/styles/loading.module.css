@@ -1,0 +1,39 @@
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingPageContainer {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingPageContainer .loading {
+  width: 3.125rem;
+  height: 3.125rem;
+  border: 0.45rem solid lightgray;
+  border-top: 0.45rem solid black;
+  border-radius: 50%;
+  animation: spinner 1s linear infinite;
+}
+
+.loading {
+  border: 0.25rem solid lightgray;
+  border-top: 0.25rem solid black;
+  border-radius: 50%;
+  animation: spinner 1s linear infinite;
+}
+
+@media (min-width: 700px) {
+  .loadingPageContainer {
+    margin-left: 12rem;
+  }
+}

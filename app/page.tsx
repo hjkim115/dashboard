@@ -1,95 +1,132 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+'use client'
+
+import { useState, useEffect, useContext } from 'react'
+import homeStyles from './styles/home.module.css'
+import {
+  getAllCategories,
+  getAllMenus,
+  getAllTables,
+  getCompanyName,
+} from './utils/firebase'
+import { useRouter } from 'next/navigation'
+import { server } from './utils/config'
+import { FaCog } from 'react-icons/fa'
+import LoadingPage from './components/LoadingPage'
+import { AuthContext } from './context/AuthContext'
+import LogIn from './components/LogIn'
 
 export default function Home() {
+  const [companyName, setCompanyName] = useState<string | null>(null)
+
+  const [categoryCount, setCategoryCount] = useState<number | null>(null)
+  const [menuCount, setMenuCount] = useState<number | null>(null)
+  const [tableCount, setTableCount] = useState<number | null>(null)
+  const [imageCount, setImageCount] = useState<number | null>(null)
+
+  const router = useRouter()
+
+  const { user } = useContext(AuthContext)
+  const store = user?.displayName
+
+  useEffect(() => {
+    async function fetchCompanyName() {
+      if (typeof store !== 'string') {
+        throw Error('Type of store should be string!')
+      }
+      const data = await getCompanyName(store)
+      setCompanyName(data)
+    }
+
+    async function fetchCategoryCount() {
+      if (typeof store !== 'string') {
+        throw Error('Type of store should be string!')
+      }
+      const data = await getAllCategories(store)
+      setCategoryCount(data.length)
+    }
+
+    async function fetchMenuCount() {
+      if (typeof store !== 'string') {
+        throw Error('Type of store should be string!')
+      }
+      const data = await getAllMenus(store)
+      setMenuCount(data.length)
+    }
+
+    async function fetchTableCount() {
+      if (typeof store !== 'string') {
+        throw Error('Type of store should be string!')
+      }
+      const data = await getAllTables(store)
+      setTableCount(data.length)
+    }
+
+    async function fetchImageCount() {
+      if (typeof store !== 'string') {
+        throw Error('Type of store should be string!')
+      }
+
+      const res = await fetch(`${server}/api/imageNames?store=${store}`)
+      const data = await res.json()
+
+      setImageCount(data.length)
+    }
+
+    if (store) {
+      fetchCompanyName()
+      fetchCategoryCount()
+      fetchMenuCount()
+      fetchTableCount()
+      fetchImageCount()
+    }
+  }, [store])
+
+  if (!user) {
+    if (user === null) {
+      return <LogIn />
+    }
+
+    return <LoadingPage />
+  }
+
+  if (
+    !(companyName && categoryCount && menuCount && tableCount && imageCount)
+  ) {
+    return <LoadingPage />
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className={homeStyles.homeContainer}>
+      <h1>
+        Welcome <span className={homeStyles.companyName}>{companyName}!</span>
+      </h1>
+      <div className={homeStyles.buttons}>
+        <div onClick={() => router.push('/update/categories')}>
+          <p>Categories</p>
+          <p className={homeStyles.count}>Total: {categoryCount}</p>
+          <button>Update</button>
+        </div>
+        <div onClick={() => router.push('/update/menus')}>
+          <p>Menus</p>
+          <p className={homeStyles.count}>Total: {menuCount}</p>
+          <button>Update</button>
+        </div>
+        <div onClick={() => router.push('/update/tables')}>
+          <p>Tables</p>
+          <p className={homeStyles.count}>Total: {tableCount}</p>
+          <button>Update</button>
+        </div>
+        <div onClick={() => router.push('/update/images')}>
+          <p>Images</p>
+          <p className={homeStyles.count}>Total: {imageCount}</p>
+          <button>Update</button>
+        </div>
+        <div onClick={() => router.push('/update/settings')}>
+          <p>Settings</p>
+          <FaCog size="4rem" style={{ color: 'gray' }} />
+          <button>Update</button>
         </div>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   )
 }

@@ -1,0 +1,82 @@
+.label {
+  display: flex;
+  width: 80%;
+  justify-content: space-between;
+  background-color: gray;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: white;
+  box-shadow: 2px 2px 10px black;
+}
+
+.item {
+  display: flex;
+  width: 80%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  border-bottom: solid 1px;
+  border-color: gray;
+}
+
+.name {
+  width: 70%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.link {
+  width: 70%;
+  white-space: nowrap;
+  overflow: hidden;
+  color: blue;
+  text-decoration: none;
+}
+
+.copy {
+  color: gray;
+}
+
+.edit {
+  width: 20%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.edit button {
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  background-color: black;
+  color: white;
+  border-radius: 0.5rem;
+  border-style: none;
+}
+
+.addItem {
+  position: fixed;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  background-color: green;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.7rem;
+  border-style: none;
+  font-size: medium;
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 700px) {
+  .copy:hover {
+    color: black;
+  }
+
+  .label {
+    width: 70%;
+  }
+
+  .item {
+    width: 70%;
+  }
+}

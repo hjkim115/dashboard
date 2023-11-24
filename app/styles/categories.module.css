@@ -1,0 +1,18 @@
+.categoriesContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2.95rem;
+  padding-bottom: 3.6rem;
+}
+
+.categoriesContainer h1 {
+  padding: 0.5rem;
+}
+
+@media (min-width: 700px) {
+  .categoriesContainer {
+    margin-left: 12rem;
+    padding-top: 0;
+  }
+}
