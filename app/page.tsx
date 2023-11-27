@@ -9,19 +9,13 @@ import {
   getCompanyName,
 } from './utils/firebase'
 import { useRouter } from 'next/navigation'
-import { server } from './utils/config'
-import { FaCog } from 'react-icons/fa'
 import LoadingPage from './components/LoadingPage'
 import { AuthContext } from './context/AuthContext'
 import LogIn from './components/LogIn'
 
 export default function Home() {
   const [companyName, setCompanyName] = useState<string | null>(null)
-
-  const [categoryCount, setCategoryCount] = useState<number | null>(null)
-  const [menuCount, setMenuCount] = useState<number | null>(null)
-  const [tableCount, setTableCount] = useState<number | null>(null)
-  const [imageCount, setImageCount] = useState<number | null>(null)
+  const [counts, setCounts] = useState<number[] | null>(null)
 
   const router = useRouter()
 
@@ -29,57 +23,32 @@ export default function Home() {
   const store = user?.displayName
 
   useEffect(() => {
-    async function fetchCompanyName() {
-      if (typeof store !== 'string') {
-        throw Error('Type of store should be string!')
-      }
+    async function fetchCompanyName(store: string) {
       const data = await getCompanyName(store)
       setCompanyName(data)
     }
 
-    async function fetchCategoryCount() {
-      if (typeof store !== 'string') {
-        throw Error('Type of store should be string!')
-      }
-      const data = await getAllCategories(store)
-      setCategoryCount(data.length)
-    }
+    async function fetchCounts(store: string) {
+      const categoryCount = (await getAllCategories(store)).length
+      const menuCount = (await getAllMenus(store)).length
+      const tableCount = (await getAllTables(store)).length
 
-    async function fetchMenuCount() {
-      if (typeof store !== 'string') {
-        throw Error('Type of store should be string!')
-      }
-      const data = await getAllMenus(store)
-      setMenuCount(data.length)
-    }
-
-    async function fetchTableCount() {
-      if (typeof store !== 'string') {
-        throw Error('Type of store should be string!')
-      }
-      const data = await getAllTables(store)
-      setTableCount(data.length)
-    }
-
-    async function fetchImageCount() {
-      if (typeof store !== 'string') {
-        throw Error('Type of store should be string!')
-      }
-
-      const res = await fetch(`${server}/api/imageNames?store=${store}`)
-      const data = await res.json()
-
-      setImageCount(data.length)
+      setCounts([categoryCount, menuCount, tableCount])
     }
 
     if (store) {
-      fetchCompanyName()
-      fetchCategoryCount()
-      fetchMenuCount()
-      fetchTableCount()
-      fetchImageCount()
+      fetchCompanyName(store)
+      fetchCounts(store)
     }
   }, [store])
+
+  const links: {
+    [key: string]: string
+  } = {
+    Categories: '/update/categories',
+    Menus: '/update/menus',
+    Tables: '/update/tables',
+  }
 
   if (!user) {
     if (user === null) {
@@ -89,9 +58,7 @@ export default function Home() {
     return <LoadingPage />
   }
 
-  if (
-    !(companyName && categoryCount && menuCount && tableCount && imageCount)
-  ) {
+  if (!(companyName && counts)) {
     return <LoadingPage />
   }
 
@@ -100,32 +67,20 @@ export default function Home() {
       <h1>
         Welcome <span className={homeStyles.companyName}>{companyName}!</span>
       </h1>
-      <div className={homeStyles.buttons}>
-        <div onClick={() => router.push('/update/categories')}>
-          <p>Categories</p>
-          <p className={homeStyles.count}>Total: {categoryCount}</p>
+
+      {Object.keys(links).map((key, i) => (
+        <div
+          className={homeStyles.menu}
+          onClick={() => router.push(links[key])}
+        >
+          <h2 className={homeStyles.name}>{key}</h2>
+          <p className={homeStyles.count}>Total: {counts[i]}</p>
           <button>Update</button>
         </div>
-        <div onClick={() => router.push('/update/menus')}>
-          <p>Menus</p>
-          <p className={homeStyles.count}>Total: {menuCount}</p>
-          <button>Update</button>
-        </div>
-        <div onClick={() => router.push('/update/tables')}>
-          <p>Tables</p>
-          <p className={homeStyles.count}>Total: {tableCount}</p>
-          <button>Update</button>
-        </div>
-        <div onClick={() => router.push('/update/images')}>
-          <p>Images</p>
-          <p className={homeStyles.count}>Total: {imageCount}</p>
-          <button>Update</button>
-        </div>
-        <div onClick={() => router.push('/update/settings')}>
-          <p>Settings</p>
-          <FaCog size="4rem" style={{ color: 'gray' }} />
-          <button>Update</button>
-        </div>
+      ))}
+
+      <div className={homeStyles.footer}>
+        <p>Powered by BS2</p>
       </div>
     </div>
   )

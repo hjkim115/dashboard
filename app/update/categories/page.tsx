@@ -22,13 +22,13 @@ export default function Categories() {
   const [categories, setCategories] = useState<Category[] | null>(null)
   //Edit
   const [editCategory, setEditCategory] = useState<Category | null>(null)
-  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [newId, setNewId] = useState<string>('')
   const [newEnglishName, setNewEnglishName] = useState<string>('')
   const [newKoreanName, setNewKoreanName] = useState<string>('')
 
   //Add
-  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
   const [id, setId] = useState('')
   const [englishName, setEnglishName] = useState('')
   const [koreanName, setKoreanName] = useState('')
@@ -37,16 +37,13 @@ export default function Categories() {
   const store = user?.displayName
 
   useEffect(() => {
-    async function fetchCategories() {
-      if (typeof store !== 'string') {
-        throw Error('Type of store should be string!')
-      }
+    async function fetchCategories(store: string) {
       const data = await getAllCategories(store)
       setCategories(data)
     }
 
     if (store) {
-      fetchCategories()
+      fetchCategories(store)
     }
   }, [store])
 
@@ -64,11 +61,11 @@ export default function Categories() {
     id === '' || englishName === '' || koreanName === '' || idExists(id)
 
   //Modal Scroll
-  if (editModalOpen || addModalOpen) {
-    document.body.classList.add(modalStyles.activeModal)
-  } else {
-    document.body.classList.remove(modalStyles.activeModal)
-  }
+  // if (editModalOpen || addOpen) {
+  //   document.body.classList.add(modalStyles.activeModal)
+  // } else {
+  //   document.body.classList.remove(modalStyles.activeModal)
+  // }
 
   function idExists(id: string) {
     if (categories) {
@@ -86,116 +83,64 @@ export default function Categories() {
     setNewId(category.id)
     setNewEnglishName(category.englishName)
     setNewKoreanName(category.koreanName)
-    setEditModalOpen(true)
-  }
-
-  function checkSort(a: Category, b: Category) {
-    if (a.id > b.id) {
-      return 1
-    }
-    if (a.id < b.id) {
-      return -1
-    }
-    return 0
+    setEditOpen(true)
   }
 
   function handleAddModalClose() {
-    setAddModalOpen(false)
+    setAddOpen(false)
     setId('')
     setEnglishName('')
     setKoreanName('')
   }
 
-  async function edit() {
-    if (!categories) {
-      throw Error('categories is not set!')
-    }
-    if (!editCategory) {
-      throw Error('editCategory is not set!')
-    }
-    if (!newId) {
-      throw Error('newId is not set!')
-    }
-    if (!newEnglishName) {
-      throw Error('newEnglishName is not set!')
-    }
-    if (!newKoreanName) {
-      throw Error('newKoreanName is not set!')
-    }
-    if (typeof store !== 'string') {
-      throw Error('Type of store should be string!')
-    }
+  async function edit(
+    e: React.FormEvent<HTMLFormElement>,
+    editCategory: Category,
+    newId: string,
+    newEnglishName: string,
+    newKoreanName: string,
+    store: string
+  ) {
+    e.preventDefault()
 
-    setEditModalOpen(false)
+    setEditOpen(false)
 
     const newCategory: Category = {
       id: newId,
       englishName: newEnglishName,
       koreanName: newKoreanName,
     }
-
     await updateCategory(store, editCategory.id, newCategory)
 
-    const newCategories = [...categories]
-
-    for (const category of newCategories) {
-      if (category.id === editCategory.id) {
-        category.id = newCategory.id
-        category.englishName = newCategory.englishName
-        category.koreanName = newCategory.koreanName
-      }
-    }
-    newCategories.sort(checkSort)
+    const newCategories = await getAllCategories(store)
     setCategories(newCategories)
   }
 
-  async function handleDelete() {
-    if (!categories) {
-      throw Error('categories is not set!')
-    }
-    if (!editCategory) {
-      throw Error('editCategory is not set!')
-    }
-    if (typeof store !== 'string') {
-      throw Error('Type of store should be string!')
-    }
-
+  async function handleDelete(editCategory: Category, store: string) {
     if (confirm('Are you sure you want to delete this category?')) {
-      setEditModalOpen(false)
+      setEditOpen(false)
       await deleteCategory(store, editCategory.id)
-      const newCategories = []
-      for (const category of categories) {
-        if (category.id === editCategory.id) {
-          continue
-        }
-        newCategories.push(category)
-      }
+      const newCategories = await getAllCategories(store)
       setCategories(newCategories)
     }
   }
 
-  async function add() {
-    if (!categories) {
-      throw Error('categories is not set!')
-    }
-    if (typeof store !== 'string') {
-      throw Error('Type of store should be string!')
-    }
-
+  async function add(e: React.FormEvent<HTMLFormElement>, store: string) {
+    e.preventDefault()
     const category: Category = {
       id: id,
       englishName: englishName,
       koreanName: koreanName,
     }
     await postCategory(store, category)
-    handleAddModalClose()
-    const newCategories = [...categories]
-    newCategories.push(category)
-    newCategories.sort(checkSort)
+
+    const newCategories = await getAllCategories(store)
     setCategories(newCategories)
+
+    handleAddModalClose()
   }
 
-  if (!categories) {
+  if (!(categories && store)) {
     return <LoadingPage />
   }
 
@@ -207,66 +152,89 @@ export default function Categories() {
       {categories.map((category) => (
         <div className={listStyles.item}>
           <p className={listStyles.name}>{category.englishName}</p>
-          <div className={listStyles.edit}>
-            <button onClick={() => handleEdit(category)}>
-              <FaPencilAlt size="0.7rem" style={{ color: 'white' }} /> Edit
-            </button>
-          </div>
+          <FaPencilAlt onClick={() => handleEdit(category)} />
         </div>
       ))}
 
       {/* Add Menu */}
-      <AddItem handleClick={setAddModalOpen}>
+      <AddItem handleClick={setAddOpen}>
         <FaPlus /> Add Category
       </AddItem>
 
       {/* Edit Modal */}
-      {editModalOpen ? (
-        <Modal handleClick={() => setEditModalOpen(false)}>
-          <div className={modalStyles.form}>
-            <h1>Edit Category</h1>
-            <p>ID</p>
-            <input
-              style={editCategory?.id !== newId ? { color: 'red' } : undefined}
-              onChange={(e) => setNewId(e.target.value.trim())}
-              defaultValue={newId ? newId : undefined}
-              type="text"
-            />
-            <p>English Name</p>
-            <input
-              style={
-                editCategory?.englishName !== newEnglishName
-                  ? { color: 'red' }
-                  : undefined
+      {editOpen ? (
+        <Modal handleClick={() => setEditOpen(false)}>
+          {editCategory ? (
+            <form
+              id="editCategoryForm"
+              onSubmit={(e) =>
+                edit(
+                  e,
+                  editCategory,
+                  newId,
+                  newEnglishName,
+                  newKoreanName,
+                  store
+                )
               }
-              onChange={(e) => setNewEnglishName(e.target.value.trim())}
-              defaultValue={newEnglishName ? newEnglishName : undefined}
-              type="text"
-            />
+              className={modalStyles.form}
+            >
+              <h1>Edit Category</h1>
+              <p>ID</p>
+              <input
+                style={
+                  editCategory?.id !== newId ? { color: 'red' } : undefined
+                }
+                onChange={(e) => setNewId(e.target.value.trim())}
+                defaultValue={newId ? newId : undefined}
+                type="text"
+              />
+              <p>English Name</p>
+              <input
+                style={
+                  editCategory?.englishName !== newEnglishName
+                    ? { color: 'red' }
+                    : undefined
+                }
+                onChange={(e) => setNewEnglishName(e.target.value.trim())}
+                defaultValue={newEnglishName ? newEnglishName : undefined}
+                type="text"
+              />
 
-            <p>Korean Name</p>
-            <input
-              style={
-                editCategory?.koreanName !== newKoreanName
-                  ? { color: 'red' }
-                  : undefined
-              }
-              onChange={(e) => setNewKoreanName(e.target.value.trim())}
-              defaultValue={newKoreanName ? newKoreanName : undefined}
-              type="text"
-            />
+              <p>Korean Name</p>
+              <input
+                style={
+                  editCategory?.koreanName !== newKoreanName
+                    ? { color: 'red' }
+                    : undefined
+                }
+                onChange={(e) => setNewKoreanName(e.target.value.trim())}
+                defaultValue={newKoreanName ? newKoreanName : undefined}
+                type="text"
+              />
 
-            {editCategory?.id !== newId && idExists(newId) ? (
-              <p className={modalStyles.message}>
-                Category with id {newId} already exists!
-              </p>
-            ) : null}
-          </div>
+              {editCategory?.id !== newId && idExists(newId) ? (
+                <p className={modalStyles.message}>
+                  Category with id {newId} already exists!
+                </p>
+              ) : null}
+            </form>
+          ) : null}
 
           <div className={modalStyles.buttons}>
-            <button onClick={() => setEditModalOpen(false)}>Close</button>
-            <button onClick={handleDelete}>Delete</button>
-            <button onClick={edit} disabled={editDisabled}>
+            <button onClick={() => setEditOpen(false)}>Close</button>
+
+            {editCategory ? (
+              <button onClick={() => handleDelete(editCategory, store)}>
+                Delete
+              </button>
+            ) : null}
+
+            <button
+              type="submit"
+              form="editCategoryForm"
+              disabled={editDisabled}
+            >
               Edit
             </button>
           </div>
@@ -274,9 +242,13 @@ export default function Categories() {
       ) : null}
 
       {/* Add Modal */}
-      {addModalOpen ? (
+      {addOpen ? (
         <Modal handleClick={handleAddModalClose}>
-          <div className={modalStyles.form}>
+          <form
+            id="addCategoryForm"
+            onSubmit={(e) => add(e, store)}
+            className={modalStyles.form}
+          >
             <h1>Add Category</h1>
             <p>ID *</p>
             <input
@@ -302,11 +274,11 @@ export default function Categories() {
                 Category with id {id} already exists!
               </p>
             ) : null}
-          </div>
+          </form>
 
           <div className={modalStyles.buttons}>
             <button onClick={handleAddModalClose}>Close</button>
-            <button onClick={add} disabled={addDisabled}>
+            <button type="submit" form="addCategoryForm" disabled={addDisabled}>
               Add
             </button>
           </div>

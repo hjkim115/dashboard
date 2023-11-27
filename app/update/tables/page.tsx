@@ -22,12 +22,12 @@ export default function Tables() {
   const [tables, setTables] = useState<Table[] | null>(null)
   //Edit
   const [editTable, setEditTable] = useState<Table | null>(null)
-  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [newId, setNewId] = useState<string>('')
   const [newTableNumber, setNewTableNumber] = useState<string>('')
 
   //Add
-  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
   const [id, setId] = useState('')
   const [tableNumber, setTableNumber] = useState('')
 
@@ -35,16 +35,13 @@ export default function Tables() {
   const store = user?.displayName
 
   useEffect(() => {
-    async function fetchTables() {
-      if (typeof store !== 'string') {
-        throw Error('Type of store should be string!')
-      }
+    async function fetchTables(store: string) {
       const data = await getAllTables(store)
       setTables(data)
     }
 
     if (store) {
-      fetchTables()
+      fetchTables(store)
     }
   }, [store])
 
@@ -58,7 +55,7 @@ export default function Tables() {
   const addDisabled = id === '' || tableNumber === '' || idExists(id)
 
   //Modal Scroll
-  if (editModalOpen || addModalOpen) {
+  if (editOpen || addOpen) {
     document.body.classList.add(modalStyles.activeModal)
   } else {
     document.body.classList.remove(modalStyles.activeModal)
@@ -79,43 +76,25 @@ export default function Tables() {
     setEditTable(table)
     setNewId(table.id)
     setNewTableNumber(table.tableNumber)
-    setEditModalOpen(true)
+    setEditOpen(true)
   }
 
   function handleAddModalClose() {
-    setAddModalOpen(false)
+    setAddOpen(false)
     setId('')
     setTableNumber('')
   }
 
-  function checkSort(a: Table, b: Table) {
-    if (a.id > b.id) {
-      return 1
-    }
-    if (a.id < b.id) {
-      return -1
-    }
-    return 0
-  }
+  async function edit(
+    e: React.FormEvent<HTMLFormElement>,
+    editTable: Table,
+    newId: string,
+    newTableNumber: string,
+    store: string
+  ) {
+    e.preventDefault()
 
-  async function edit() {
-    if (!tables) {
-      throw Error('tables is not set!')
-    }
-    if (!editTable) {
-      throw Error('editTable is not set!')
-    }
-    if (!newId) {
-      throw Error('newId is not set!')
-    }
-    if (!newTableNumber) {
-      throw Error('newTableNumber is not set!')
-    }
-    if (typeof store !== 'string') {
-      throw Error('Type of store should be string!')
-    }
-
-    setEditModalOpen(false)
+    setEditOpen(false)
 
     const table: Table = {
       id: newId,
@@ -124,65 +103,34 @@ export default function Tables() {
 
     await updateTable(store, editTable.id, table)
 
-    const newTables = [...tables]
-
-    for (const table of newTables) {
-      if (table.id === editTable.id) {
-        table.id = newId
-        table.tableNumber = newTableNumber
-      }
-    }
-
-    newTables.sort(checkSort)
+    const newTables = await getAllTables(store)
     setTables(newTables)
   }
 
-  async function handleDelete() {
-    if (!tables) {
-      throw Error('tables is not set!')
-    }
-    if (!editTable) {
-      throw Error('editTable is not set!')
-    }
-    if (typeof store !== 'string') {
-      throw Error('Type of store should be string!')
-    }
-
+  async function handleDelete(editTable: Table, store: string) {
     if (confirm('Are you sure you want to delete this table?')) {
-      setEditModalOpen(false)
+      setEditOpen(false)
       await deleteTable(store, editTable.id)
-      const newTables = []
-      for (const table of tables) {
-        if (table.id === editTable.id) {
-          continue
-        }
-        newTables.push(table)
-      }
+      const newTables = await getAllTables(store)
       setTables(newTables)
     }
   }
 
-  async function add() {
-    if (!tables) {
-      throw Error('tables is not set!')
-    }
-    if (typeof store !== 'string') {
-      throw Error('Type of store should be string!')
-    }
-
+  async function add(e: React.FormEvent<HTMLFormElement>, store: string) {
+    e.preventDefault()
     const table: Table = {
       id: id,
       tableNumber: tableNumber,
     }
     await postTable(store, table)
-    handleAddModalClose()
-    const newTables = [...tables]
-    newTables.push(table)
-    newTables.sort(checkSort)
+
+    const newTables = await getAllTables(store)
     setTables(newTables)
+
+    handleAddModalClose()
   }
 
-  if (!tables) {
+  if (!(tables && store)) {
     return <LoadingPage />
   }
 
@@ -194,54 +142,60 @@ export default function Tables() {
       {tables?.map((table) => (
         <div className={listStyles.item}>
           <p className={listStyles.name}>Table {table.tableNumber}</p>
-          <div className={listStyles.edit}>
-            <button onClick={() => handleEdit(table)}>
-              <FaPencilAlt size="0.7rem" style={{ color: 'white' }} /> Edit
-            </button>
-          </div>
+          <FaPencilAlt onClick={() => handleEdit(table)} />
         </div>
       ))}
 
       {/* Add Menu */}
-      <AddItem handleClick={setAddModalOpen}>
+      <AddItem handleClick={setAddOpen}>
         <FaPlus /> Add Table
       </AddItem>
 
       {/* Edit Modal */}
-      {editModalOpen ? (
-        <Modal handleClick={() => setEditModalOpen(false)}>
-          <div className={modalStyles.form}>
-            <h1>Edit Table</h1>
-            <p>ID</p>
-            <input
-              style={editTable?.id !== newId ? { color: 'red' } : undefined}
-              onChange={(e) => setNewId(e.target.value.trim())}
-              defaultValue={newId ? newId : undefined}
-              type="text"
-            />
-            <p>Table Number</p>
-            <input
-              style={
-                editTable?.tableNumber !== newTableNumber
-                  ? { color: 'red' }
-                  : undefined
-              }
-              onChange={(e) => setNewTableNumber(e.target.value.trim())}
-              defaultValue={newTableNumber ? newTableNumber : undefined}
-              type="text"
-            />
+      {editOpen ? (
+        <Modal handleClick={() => setEditOpen(false)}>
+          {editTable ? (
+            <form
+              id="editTableForm"
+              onSubmit={(e) => edit(e, editTable, newId, newTableNumber, store)}
+              className={modalStyles.form}
+            >
+              <h1>Edit Table</h1>
+              <p>ID</p>
+              <input
+                style={editTable?.id !== newId ? { color: 'red' } : undefined}
+                onChange={(e) => setNewId(e.target.value.trim())}
+                defaultValue={newId ? newId : undefined}
+                type="text"
+              />
+              <p>Table Number</p>
+              <input
+                style={
+                  editTable?.tableNumber !== newTableNumber
+                    ? { color: 'red' }
+                    : undefined
+                }
+                onChange={(e) => setNewTableNumber(e.target.value.trim())}
+                defaultValue={newTableNumber ? newTableNumber : undefined}
+                type="text"
+              />
 
-            {editTable?.id !== newId && idExists(newId) ? (
-              <p className={modalStyles.message}>
-                Table with id {newId} already exists!
-              </p>
-            ) : null}
-          </div>
+              {editTable?.id !== newId && idExists(newId) ? (
+                <p className={modalStyles.message}>
+                  Table with id {newId} already exists!
+                </p>
+              ) : null}
+            </form>
+          ) : null}
 
           <div className={modalStyles.buttons}>
-            <button onClick={() => setEditModalOpen(false)}>Close</button>
-            <button onClick={handleDelete}>Delete</button>
-            <button onClick={edit} disabled={editDisabled}>
+            <button onClick={() => setEditOpen(false)}>Close</button>
+            {editTable ? (
+              <button onClick={() => handleDelete(editTable, store)}>
+                Delete
+              </button>
+            ) : null}
+            <button type="submit" form="editTableForm" disabled={editDisabled}>
               Edit
             </button>
           </div>
@@ -249,9 +203,13 @@ export default function Tables() {
       ) : null}
 
       {/* Add Modal */}
-      {addModalOpen ? (
+      {addOpen ? (
         <Modal handleClick={handleAddModalClose}>
-          <div className={modalStyles.form}>
+          <form
+            id="addTableForm"
+            onSubmit={(e) => add(e, store)}
+            className={modalStyles.form}
+          >
             <h1>Add Table</h1>
             <p>ID *</p>
             <input
@@ -268,14 +226,14 @@ export default function Tables() {
 
             {idExists(id) ? (
               <p className={modalStyles.message}>
-                Table with id {newId} already exists!
+                Table with id {id} already exists!
               </p>
             ) : null}
-          </div>
+          </form>
 
           <div className={modalStyles.buttons}>
             <button onClick={handleAddModalClose}>Close</button>
-            <button onClick={add} disabled={addDisabled}>
+            <button type="submit" form="addTableForm" disabled={addDisabled}>
               Add
             </button>
           </div>

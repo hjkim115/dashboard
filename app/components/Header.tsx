@@ -1,19 +1,20 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect, useContext } from 'react'
-import { getCompanyName } from '../utils/firebase'
+import { useState, useContext } from 'react'
 import headerStyles from '../styles/header.module.css'
 import { useRouter, usePathname } from 'next/navigation'
-import { FaBars, FaTimes, FaPowerOff, FaHome } from 'react-icons/fa'
+import { FaBars, FaTimes, FaPowerOff, FaHome, FaCog } from 'react-icons/fa'
 import Loading from './Loading'
 import { AuthContext } from '../context/AuthContext'
+import { CompanyNameContext } from '../context/CompanyNameContext'
 
 export default function Header() {
-  const [companyName, setCompanyName] = useState<string | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const { user, logOut } = useContext(AuthContext)
   const store = user?.displayName
+
+  const { companyName } = useContext(CompanyNameContext)
 
   const router = useRouter()
   const pathName = usePathname()
@@ -24,29 +25,13 @@ export default function Header() {
     Categories: '/update/categories',
     Menus: '/update/menus',
     Tables: '/update/tables',
-    Images: '/update/images',
-    Settings: '/update/settings',
   }
 
-  if (isOpen) {
-    document.body.classList.add(headerStyles.activeModal)
-  } else {
-    document.body.classList.remove(headerStyles.activeModal)
-  }
-
-  useEffect(() => {
-    async function fetchCompanyName() {
-      if (typeof store !== 'string') {
-        throw Error('Type of store should be string!')
-      }
-      const data = await getCompanyName(store)
-      setCompanyName(data)
-    }
-
-    if (store) {
-      fetchCompanyName()
-    }
-  }, [store])
+  // if (isOpen) {
+  //   document.body.classList.add(headerStyles.activeModal)
+  // } else {
+  //   document.body.classList.remove(headerStyles.activeModal)
+  // }
 
   async function handleLogOut() {
     if (confirm('Are you sure you want to log out?')) {
@@ -104,6 +89,12 @@ export default function Header() {
             size="1.2rem"
           />
         ) : null}
+
+        <FaCog
+          className={headerStyles.settings}
+          onClick={() => router.push('/update/settings')}
+          size="1.2rem"
+        />
 
         <FaPowerOff
           className={headerStyles.logOut}

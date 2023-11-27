@@ -20,11 +20,16 @@
 }
 
 .home {
+  margin-right: 1rem;
+  color: white;
+}
+
+.settings {
+  margin-right: 1rem;
   color: white;
 }
 
 .logOut {
-  margin-left: 1rem;
   margin-right: 1rem;
   color: white;
 }
@@ -165,7 +170,10 @@ body.activeModal {
   .buttons {
     position: fixed;
     bottom: 0;
-    align-self: flex-end;
+    left: 0;
+    width: 12rem;
+    display: flex;
+    justify-content: space-evenly;
     padding: 0.5rem;
   }
 
@@ -173,9 +181,24 @@ body.activeModal {
     display: none;
   }
 
+  .home {
+    margin-right: 0;
+  }
+
+  .home:hover {
+    color: gray;
+  }
+
+  .settings {
+    margin-right: 0;
+  }
+
+  .settings:hover {
+    color: gray;
+  }
+
   .logOut {
     margin-right: 0;
-    margin-left: 0.5rem;
   }
 
   .logOut:hover {

@@ -12,12 +12,10 @@ import {
   limit,
   addDoc,
   writeBatch,
-  setDoc,
-  documentId,
   updateDoc,
   deleteDoc,
+  setDoc,
 } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
 import {
   Category,
   Menu,
@@ -27,6 +25,7 @@ import {
   OrderHeader,
   OrderDetail,
 } from './types'
+import { getAuth } from 'firebase/auth'
 
 //Firebase Setup
 const firebaseConfig = {
@@ -45,7 +44,7 @@ export const auth = getAuth(app)
 
 //Categories Get All
 export async function getAllCategories(store: string) {
-  const categoriesRef = collection(db, `${store}Categories`)
+  const categoriesRef = collection(doc(db, 'categories', store), 'categories')
   const categoriesQuery = query(categoriesRef, orderBy('id'))
   const snapshot = await getDocs(categoriesQuery)
 
@@ -59,7 +58,7 @@ export async function getAllCategories(store: string) {
 
 //Categories Post
 export async function postCategory(store: string, category: Category) {
-  const categoriesRef = collection(db, `${store}Categories`)
+  const categoriesRef = collection(doc(db, 'categories', store), 'categories')
   await addDoc(categoriesRef, category)
 }
 
@@ -69,7 +68,7 @@ export async function updateCategory(
   id: string,
   newCategory: Category
 ) {
-  const categoriesRef = collection(db, `${store}Categories`)
+  const categoriesRef = collection(doc(db, 'categories', store), 'categories')
   const categoriesQuery = query(categoriesRef, where('id', '==', id))
   const snapshot = await getDocs(categoriesQuery)
 
@@ -82,13 +81,13 @@ export async function updateCategory(
     throw Error(`Failed to find category with id ${id}!`)
   }
 
-  const categoryRef = doc(db, `${store}Categories`, refId)
+  const categoryRef = doc(doc(db, 'categories', store), 'categories', refId)
   await updateDoc(categoryRef, newCategory)
 }
 
 //Categories Delete
 export async function deleteCategory(store: string, id: string) {
-  const categoriesRef = collection(db, `${store}Categories`)
+  const categoriesRef = collection(doc(db, 'categories', store), 'categories')
   const categoriesQuery = query(categoriesRef, where('id', '==', id))
   const snapshot = await getDocs(categoriesQuery)
 
@@ -101,14 +100,14 @@ export async function deleteCategory(store: string, id: string) {
     throw Error(`Failed to find category with id ${id}!`)
   }
 
-  const categoryRef = doc(db, `${store}Categories`, refId)
+  const categoryRef = doc(doc(db, 'categories', store), 'categories', refId)
   await deleteDoc(categoryRef)
 }
 
 //Company Name Get
 export async function getCompanyName(store: string) {
-  const companyNameRef = doc(db, `${store}Settings`, 'companyName')
-  const snapshot = await getDoc(companyNameRef)
+  const settingsRef = doc(db, 'settings', store)
+  const snapshot = await getDoc(settingsRef)
   const companyName = snapshot.data()?.name as string
 
   return companyName
@@ -116,13 +115,13 @@ export async function getCompanyName(store: string) {
 
 //Company Name Put
 export async function updateCompanyName(store: string, companyName: string) {
-  const companyNameRef = doc(db, `${store}Settings`, 'companyName')
-  await setDoc(companyNameRef, { name: companyName })
+  const settingsRef = doc(db, 'settings', store)
+  await setDoc(settingsRef, { name: companyName })
 }
 
 //Tables Get All
 export async function getAllTables(store: string) {
-  const tablesRef = collection(db, `${store}Tables`)
+  const tablesRef = collection(doc(db, 'tables', store), 'tables')
   const tablesQuery = query(tablesRef, orderBy('id'))
   const snapshot = await getDocs(tablesQuery)
 
@@ -136,13 +135,13 @@ export async function getAllTables(store: string) {
 
 //Tables Post
 export async function postTable(store: string, table: Table) {
-  const tablesRef = collection(db, `${store}Tables`)
+  const tablesRef = collection(doc(db, 'tables', store), 'tables')
   await addDoc(tablesRef, table)
 }
 
 //Tables Put
 export async function updateTable(store: string, id: string, table: Table) {
-  const tablesRef = collection(db, `${store}Tables`)
+  const tablesRef = collection(doc(db, 'tables', store), 'tables')
   const tablesQuery = query(tablesRef, where('id', '==', id))
   const snapshot = await getDocs(tablesQuery)
 
@@ -155,13 +154,13 @@ export async function updateTable(store: string, id: string, table: Table) {
     throw Error(`Failed to find table with id ${id}!`)
   }
 
-  const tableRef = doc(db, `${store}Tables`, refId)
+  const tableRef = doc(doc(db, 'tables', store), 'tables', refId)
   await updateDoc(tableRef, table)
 }
 
 //Tables Delete
 export async function deleteTable(store: string, id: string) {
-  const tablesRef = collection(db, `${store}Tables`)
+  const tablesRef = collection(doc(db, 'tables', store), 'tables')
   const tablesQuery = query(tablesRef, where('id', '==', id))
   const snapshot = await getDocs(tablesQuery)
 
@@ -174,13 +173,13 @@ export async function deleteTable(store: string, id: string) {
     throw Error(`Failed to find table with id ${id}!`)
   }
 
-  const tableRef = doc(db, `${store}Tables`, refId)
+  const tableRef = doc(doc(db, 'tables', store), 'tables', refId)
   await deleteDoc(tableRef)
 }
 
 //Menus Get All
 export async function getAllMenus(store: string) {
-  const menusRef = collection(db, `${store}Menus`)
+  const menusRef = collection(doc(db, 'menus', store), 'menus')
   const snapshot = await getDocs(menusRef)
 
   const menus: Menu[] = []
@@ -193,7 +192,7 @@ export async function getAllMenus(store: string) {
 
 //Menu Get
 export async function getMenu(store: string, category: string, id: string) {
-  const menuRef = doc(db, `${store}Menus`, `${category}-${id}`)
+  const menuRef = doc(doc(db, 'menus', store), 'menus', `${category}-${id}`)
   const snapshot = await getDoc(menuRef)
   const menu = snapshot.data() as Menu
 
@@ -202,7 +201,7 @@ export async function getMenu(store: string, category: string, id: string) {
 
 //Options Get
 export async function getOptions(store: string, category: string, id: string) {
-  const optionsRef = collection(db, `${store}Options`)
+  const optionsRef = collection(doc(db, 'options', store), 'options')
   const optionsQuery = query(
     optionsRef,
     where('menuCategory', '==', category),
@@ -225,120 +224,4 @@ export async function getOptions(store: string, category: string, id: string) {
   }
 
   return options
-}
-
-//Last Order Id Get
-export async function getLastOrderIdOrNull(store: string) {
-  const orderHeadersRef = collection(db, `${store}OrderHeaders`)
-  const orderHeadersQuery = query(
-    orderHeadersRef,
-    orderBy('id', 'desc'),
-    limit(1)
-  )
-  const snapshot = await getDocs(orderHeadersQuery)
-
-  const documents: DocumentData[] = []
-  snapshot.forEach((document) => {
-    documents.push(document.data())
-  })
-
-  if (documents.length < 1) {
-    return null
-  }
-
-  return documents[0].id as string
-}
-
-//Order Header Get
-export async function getOrderHeaders(store: string) {
-  const orderHeadersRef = collection(db, `${store}OrderHeaders`)
-  const orderHeadersQuery = query(
-    orderHeadersRef,
-    where('status', '==', 'Unread')
-  )
-  const snapshot = await getDocs(orderHeadersQuery)
-
-  const orderHeaders: OrderHeader[] = []
-  const refIds: string[] = []
-
-  snapshot.forEach((orderHeader) => {
-    orderHeaders.push(orderHeader.data() as OrderHeader)
-    refIds.push(orderHeader.id)
-  })
-
-  return {
-    orderHeaders: orderHeaders,
-    refIds: refIds,
-  }
-}
-
-//Order Header Put
-export async function updateOrderHeaders(store: string, refIds: string[]) {
-  const batch = writeBatch(db)
-
-  for (const refId of refIds) {
-    const orderHeaderRef = doc(db, `${store}OrderHeaders`, refId)
-    batch.update(orderHeaderRef, {
-      status: 'Read',
-    })
-  }
-
-  await batch.commit()
-}
-
-//Order Header Post
-export async function postOrderHeader(store: string, orderHeader: OrderHeader) {
-  const orderHeadersRef = collection(db, `${store}OrderHeaders`)
-
-  await addDoc(orderHeadersRef, orderHeader)
-}
-
-//Order Details Get
-export async function getOrderDetails(store: string) {
-  const orderDetailsRef = collection(db, `${store}OrderDetails`)
-  const orderDetailsQuery = query(
-    orderDetailsRef,
-    where('status', '==', 'Unread')
-  )
-  const snapshot = await getDocs(orderDetailsQuery)
-
-  const orderDetails: OrderDetail[] = []
-  const refIds: string[] = []
-
-  snapshot.forEach((orderDetail) => {
-    orderDetails.push(orderDetail.data() as OrderDetail)
-    refIds.push(orderDetail.id)
-  })
-
-  return {
-    orderDetails: orderDetails,
-    refIds: refIds,
-  }
-}
-
-//Order Details Put
-export async function updateOrderDetails(store: string, refIds: string[]) {
-  const batch = writeBatch(db)
-
-  for (const refId of refIds) {
-    const orderDetailRef = doc(db, `${store}OrderDetails`, refId)
-    batch.update(orderDetailRef, { status: 'Read' })
-  }
-
-  batch.commit()
-}
-
-//Order Details Post
-export async function postOrderDetails(
-  store: string,
-  orderDetails: OrderDetail[]
-) {
-  const batch = writeBatch(db)
-
-  for (const orderDetail of orderDetails) {
-    const orderDetailRef = doc(collection(db, `${store}OrderDetails`))
-    batch.set(orderDetailRef, orderDetail)
-  }
-
-  await batch.commit()
 }

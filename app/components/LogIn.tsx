@@ -11,7 +11,8 @@ export default function LogIn() {
 
   const { logIn } = useContext(AuthContext)
 
-  async function handleLogIn() {
+  async function handleLogIn(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
     try {
       await logIn(email.trim(), password.trim())
     } catch (error) {
@@ -26,7 +27,7 @@ export default function LogIn() {
       <h1>
         <span>BS2</span> Log In
       </h1>
-      <div className={authStyles.form}>
+      <form id="logInForm" onSubmit={handleLogIn} className={authStyles.form}>
         <div>
           <p>Email</p>
           <input
@@ -44,8 +45,10 @@ export default function LogIn() {
           />
         </div>
         {error ? <p style={{ color: 'red' }}>{error}</p> : null}
-      </div>
-      <button onClick={handleLogIn}>Log In</button>
+      </form>
+      <button type="submit" form="logInForm">
+        Log In
+      </button>
     </div>
   )
 }

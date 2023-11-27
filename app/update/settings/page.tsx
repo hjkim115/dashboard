@@ -5,29 +5,20 @@ import { useState, useEffect, useContext } from 'react'
 import { getCompanyName, updateCompanyName } from '../../utils/firebase'
 import LoadingPage from '../../components/LoadingPage'
 import { AuthContext } from '@/app/context/AuthContext'
+import { CompanyNameContext } from '@/app/context/CompanyNameContext'
 
 export default function Settings() {
-  const [companyName, setCompanyName] = useState<string | null>(null)
   const [newCompanyName, setNewCompanyName] = useState<string | null>(null)
 
   const { user } = useContext(AuthContext)
   const store = user?.displayName
 
-  const isDisabled = companyName === newCompanyName
+  const { companyName, setCompanyName } = useContext(CompanyNameContext)
 
-  useEffect(() => {
-    async function fetchCompanyName() {
-      if (typeof store !== 'string') {
-        throw Error('Type of store should be string!')
-      }
-      const data = await getCompanyName(store)
-      setCompanyName(data)
-    }
-
-    if (store) {
-      fetchCompanyName()
-    }
-  }, [store])
+  let isDisabled
+  if (newCompanyName != null) {
+    isDisabled = companyName === newCompanyName || newCompanyName?.length <= 0
+  }
 
   useEffect(() => {
     if (companyName) {
@@ -35,19 +26,12 @@ export default function Settings() {
     }
   }, [companyName])
 
-  async function update() {
-    if (typeof store !== 'string') {
-      throw Error('Type of store should be string!')
-    }
-
-    if (typeof newCompanyName !== 'string') {
-      throw Error('Type of newCompanyName should be string!')
-    }
+  async function update(store: string, newCompanyName: string) {
     await updateCompanyName(store, newCompanyName)
-    setCompanyName(newCompanyName)
+    setCompanyName(await getCompanyName(store))
   }
 
-  if (!(companyName && newCompanyName)) {
+  if (!store || companyName == null || newCompanyName == null) {
     return <LoadingPage />
   }
 
@@ -66,7 +50,10 @@ export default function Settings() {
       </div>
 
       <div className={settingsStyles.update}>
-        <button disabled={isDisabled} onClick={update}>
+        <button
+          disabled={isDisabled}
+          onClick={() => update(store, newCompanyName)}
+        >
           Update
         </button>
       </div>

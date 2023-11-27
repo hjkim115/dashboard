@@ -18,7 +18,7 @@ export default function Menus() {
   const [categories, setCategories] = useState<Category[] | null>(null)
   const [menus, setMenus] = useState<Menu[] | null>(null)
   const [selectedCategory, setSelectedCategory] = useState('')
-  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
 
   const router = useRouter()
 
@@ -26,25 +26,19 @@ export default function Menus() {
   const store = user?.displayName
 
   useEffect(() => {
-    async function fetchCategories() {
-      if (typeof store !== 'string') {
-        throw Error('Type of store should be string!')
-      }
+    async function fetchCategories(store: string) {
       const data = await getAllCategories(store)
       setCategories(data)
     }
 
-    async function fetchMenus() {
-      if (typeof store !== 'string') {
-        throw Error('Type of store should be string!')
-      }
+    async function fetchMenus(store: string) {
       const data = await getAllMenus(store)
       setMenus(data)
     }
 
     if (store) {
-      fetchCategories()
-      fetchMenus()
+      fetchCategories(store)
+      fetchMenus(store)
     }
   }, [store])
 
@@ -62,13 +56,10 @@ export default function Menus() {
   }
 
   function handleAddModalClose() {
-    setAddModalOpen(false)
+    setAddOpen(false)
   }
 
-  function menuCategoryValid(menuCategory: string) {
-    if (!categories) {
-      throw Error('categories is not set!')
-    }
+  function menuCategoryValid(categories: Category[], menuCategory: string) {
     for (const category of categories) {
       if (menuCategory === category.id) {
         return true
@@ -101,33 +92,29 @@ export default function Menus() {
         <div className={listStyles.item}>
           <p
             style={
-              !menuCategoryValid(menu.category) ? { color: 'red' } : undefined
+              !menuCategoryValid(categories, menu.category)
+                ? { color: 'red' }
+                : undefined
             }
             className={listStyles.name}
           >
             {menu.englishName}
           </p>
-          <div className={listStyles.edit}>
-            <button
-              onClick={() =>
-                router.push(
-                  `/update/menus/${menu.id}?category=${menu.category}`
-                )
-              }
-            >
-              <FaPencilAlt size="0.7rem" style={{ color: 'white' }} /> Edit
-            </button>
-          </div>
+          <FaPencilAlt
+            onClick={() =>
+              router.push(`/update/menus/${menu.id}?category=${menu.category}`)
+            }
+          />
         </div>
       ))}
 
       {/* Add Menu */}
-      <AddItem handleClick={setAddModalOpen}>
+      <AddItem handleClick={setAddOpen}>
         <FaPlus /> Add Menu
       </AddItem>
 
       {/* Add Modal */}
-      {addModalOpen ? (
+      {addOpen ? (
         <Modal handleClick={handleAddModalClose}>
           {/* Form */}
           <div className={modalStyles.form}>
@@ -155,7 +142,7 @@ export default function Menus() {
 
           {/* Buttons */}
           <div className={modalStyles.buttons}>
-            <button onClick={() => setAddModalOpen(false)}>Close</button>
+            <button onClick={() => setAddOpen(false)}>Close</button>
             <button>Add</button>
           </div>
         </Modal>
