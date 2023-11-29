@@ -11,7 +11,7 @@ import {
 import Label from '../../components/Label'
 import listStyles from '../../styles/list.module.css'
 import categoriesStyles from '../../styles/categories.module.css'
-import modalStyles from '../../styles/modal.module.css'
+import formStyles from '../../styles/form.module.css'
 import { FaPencilAlt, FaPlus } from 'react-icons/fa'
 import AddItem from '../../components/AddItem'
 import Modal from '../../components/Modal'
@@ -36,6 +36,8 @@ export default function Categories() {
   const { user } = useContext(AuthContext)
   const store = user?.displayName
 
+  const pattern = /^[a-zA-Z0-9]+$/
+
   useEffect(() => {
     async function fetchCategories(store: string) {
       const data = await getAllCategories(store)
@@ -55,10 +57,15 @@ export default function Categories() {
     newId === '' ||
     newEnglishName === '' ||
     newKoreanName === '' ||
-    idExists(newId)
+    idExists(newId) ||
+    !pattern.test(newId)
 
   const addDisabled =
-    id === '' || englishName === '' || koreanName === '' || idExists(id)
+    id === '' ||
+    englishName === '' ||
+    koreanName === '' ||
+    idExists(id) ||
+    !pattern.test(id)
 
   //Modal Scroll
   // if (editModalOpen || addOpen) {
@@ -78,7 +85,7 @@ export default function Categories() {
     }
   }
 
-  function handleEdit(category: Category) {
+  function handleEditOpen(category: Category) {
     setEditCategory(category)
     setNewId(category.id)
     setNewEnglishName(category.englishName)
@@ -152,7 +159,7 @@ export default function Categories() {
       {categories.map((category) => (
         <div className={listStyles.item}>
           <p className={listStyles.name}>{category.englishName}</p>
-          <FaPencilAlt onClick={() => handleEdit(category)} />
+          <FaPencilAlt onClick={() => handleEditOpen(category)} />
         </div>
       ))}
 
@@ -177,7 +184,7 @@ export default function Categories() {
                   store
                 )
               }
-              className={modalStyles.form}
+              className={formStyles.form}
             >
               <h1>Edit Category</h1>
               <p>ID</p>
@@ -214,14 +221,20 @@ export default function Categories() {
               />
 
               {editCategory?.id !== newId && idExists(newId) ? (
-                <p className={modalStyles.message}>
+                <p className={formStyles.message}>
                   Category with id {newId} already exists!
+                </p>
+              ) : null}
+
+              {newId.length > 0 && !pattern.test(newId) ? (
+                <p className={formStyles.message}>
+                  id should be alphanumeric{'('}a-z, A-Z, 0-9{')'}!
                 </p>
               ) : null}
             </form>
           ) : null}
 
-          <div className={modalStyles.buttons}>
+          <div className={formStyles.buttons}>
             <button onClick={() => setEditOpen(false)}>Close</button>
 
             {editCategory ? (
@@ -247,7 +260,7 @@ export default function Categories() {
           <form
             id="addCategoryForm"
             onSubmit={(e) => add(e, store)}
-            className={modalStyles.form}
+            className={formStyles.form}
           >
             <h1>Add Category</h1>
             <p>ID *</p>
@@ -270,13 +283,19 @@ export default function Categories() {
             />
 
             {idExists(id) ? (
-              <p className={modalStyles.message}>
+              <p className={formStyles.message}>
                 Category with id {id} already exists!
+              </p>
+            ) : null}
+
+            {id.length > 0 && !pattern.test(id) ? (
+              <p className={formStyles.message}>
+                id should be alphanumeric{'('}a-z, A-Z, 0-9{')'}!
               </p>
             ) : null}
           </form>
 
-          <div className={modalStyles.buttons}>
+          <div className={formStyles.buttons}>
             <button onClick={handleAddModalClose}>Close</button>
             <button type="submit" form="addCategoryForm" disabled={addDisabled}>
               Add

@@ -5,12 +5,12 @@ export type Category = {
 }
 
 export type Menu = {
-  id: number
+  id: string
   category: string
   koreanName: string
   englishName: string
   price: number
-  description: string
+  description?: string
   imageName: string
 }
 

@@ -12,25 +12,17 @@
 }
 
 .form {
-  padding: 0.5rem;
   width: 80%;
-  background-color: white;
-  box-shadow: 2px 2px 10px;
-}
-
-.update {
-  width: 80%;
-  display: flex;
   padding: 0.5rem;
-  justify-content: flex-end;
-}
-
-.update button {
-  padding: 0.5rem;
-  border-style: none;
+  padding-bottom: 1rem;
   border-radius: 0.5rem;
-  background-color: black;
-  color: white;
+  box-shadow: 2px 2px 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.buttons {
+  width: 80%;
 }
 
 .options {

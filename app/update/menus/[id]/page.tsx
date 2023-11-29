@@ -2,9 +2,10 @@
 
 import { useContext, useEffect, useState } from 'react'
 import detailsStyles from '../../../styles/details.module.css'
-import { Menu, Option, Options } from '@/app/utils/types'
+import formStyles from '../../../styles/form.module.css'
+import { Category, Menu, Option, Options } from '@/app/utils/types'
 import { AuthContext } from '@/app/context/AuthContext'
-import { getMenu, getOptions } from '@/app/utils/firebase'
+import { getAllCategories, getMenu, getOptions } from '@/app/utils/firebase'
 import { useParams, useSearchParams } from 'next/navigation'
 import LoadingPage from '@/app/components/LoadingPage'
 import { FaPlus, FaAngleDown, FaAngleUp, FaPencilAlt } from 'react-icons/fa'
@@ -12,17 +13,59 @@ import Modal from '@/app/components/Modal'
 
 export default function menu() {
   const [menu, setMenu] = useState<Menu | null>(null)
+  const [categories, setCategories] = useState<Category[] | null>(null)
   const [options, setOptions] = useState<Options | null>(null)
   const [optionsOpens, setOptionsOpens] = useState<boolean[] | null>(null)
 
+  const idPattern = /^[a-zA-Z0-9]+$/
+
+  const [editMenuOpen, setEditMenuOpen] = useState(false)
+
   //Add Category
   const [addCategoryOpen, setAddCategoryOpen] = useState(false)
+  const [newOptionCategory, setNewOptionCategory] = useState('')
+  const addOptionCategoryDisabled = newOptionCategory === ''
+
+  function handleAddCategoryClose() {
+    setAddCategoryOpen(false)
+    setNewOptionCategory('')
+  }
+
+  function addOptionCategory(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+
+    const newOptions: Options = { ...options }
+    newOptions[newOptionCategory] = []
+    setOptions(newOptions)
+    handleAddCategoryClose()
+  }
 
   //Edit Category
   const [editCategoryOpen, setEditCategoryOpen] = useState(false)
 
   //Add Option
   const [addOptionOpen, setAddOptionOpen] = useState(false)
+  const [optionId, setOptionId] = useState('')
+  const [englishName, setEnglishName] = useState('')
+  const [koreanName, setKoreanName] = useState('')
+  const [price, setPrice] = useState('')
+
+  function handleAddOptionClose() {
+    setAddOptionOpen(false)
+    setOptionId('')
+    setEnglishName('')
+    setKoreanName('')
+    setPrice('')
+  }
+
+  function addOption(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+
+    const newOptions: Options = { ...options }
+    newOptions[newOptionCategory] = []
+    setOptions(newOptions)
+    handleAddCategoryClose()
+  }
 
   //Edit Option
   const [editOptionOpen, setEditOptionOpen] = useState(false)
@@ -34,6 +77,11 @@ export default function menu() {
   const store = user?.displayName
 
   useEffect(() => {
+    async function fetchCategories(store: string) {
+      const data = await getAllCategories(store)
+      setCategories(data)
+    }
+
     async function fetchMenu(store: string, category: string, id: string) {
       const data = await getMenu(store, category, id)
       setMenu(data)
@@ -46,6 +94,7 @@ export default function menu() {
 
     if (store && category && id) {
       if (typeof id === 'string') {
+        fetchCategories(store)
         fetchMenu(store, category, id)
         fetchOptions(store, category, id)
       }
@@ -63,7 +112,17 @@ export default function menu() {
     }
   }, [options])
 
-  if (!(menu && options && optionsOpens)) {
+  function menuCategoryValid(categories: Category[], menuCategory: string) {
+    for (const category of categories) {
+      if (menuCategory === category.id) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  if (!(categories && menu && options && optionsOpens)) {
     return <LoadingPage />
   }
 
@@ -71,25 +130,34 @@ export default function menu() {
     <div className={detailsStyles.detailsContainer}>
       <h1>Edit Menu</h1>
 
+      {!menuCategoryValid(categories, menu.category) ? (
+        <p className={formStyles.message}>Current category has been deleted!</p>
+      ) : null}
+
       <div className={detailsStyles.form}>
-        <p>ID</p>
-        <input />
-        <p>Category</p>
-        <select></select>
-        <p>English Name</p>
-        <input />
-        <p>Korean Name</p>
-        <input />
-        <p>Price</p>
-        <input />
-        <p>Description</p>
-        <textarea rows={3} placeholder="Description" />
-        <p>Image Name</p>
-        <input />
+        <form className={formStyles.form}>
+          <p>ID*</p>
+          <input />
+          <p>Category*</p>
+          <select></select>
+          <p>English Name*</p>
+          <input />
+          <p>Korean Name*</p>
+          <input />
+          <p>Price*</p>
+          <input />
+          <p>Description</p>
+          <textarea rows={3} placeholder="Description" />
+          <p>Image*</p>
+          <input type="file" />
+        </form>
       </div>
 
-      <div className={detailsStyles.update}>
-        <button>Update</button>
+      <div className={detailsStyles.buttons}>
+        <div className={formStyles.buttons}>
+          <button>Delete</button>
+          <button>Update</button>
+        </div>
       </div>
 
       <h2 className={detailsStyles.options}>Options</h2>
@@ -145,8 +213,28 @@ export default function menu() {
 
       {addCategoryOpen ? (
         <Modal handleClick={() => setAddCategoryOpen(false)}>
-          <div>
-            <h2>Add Category</h2>
+          <form
+            onSubmit={(e) => addOptionCategory(e)}
+            id="addOptionCategory"
+            className={formStyles.form}
+          >
+            <h1>Add Category</h1>
+            <p>Category *</p>
+            <input
+              onChange={(e) => setNewOptionCategory(e.target.value.trim())}
+              type="text"
+              placeholder="Category"
+            />
+          </form>
+          <div className={formStyles.buttons}>
+            <button onClick={() => handleAddCategoryClose()}>Close</button>
+            <button
+              type="submit"
+              form="addOptionCategory"
+              disabled={addOptionCategoryDisabled}
+            >
+              Add
+            </button>
           </div>
         </Modal>
       ) : null}
@@ -161,8 +249,38 @@ export default function menu() {
 
       {addOptionOpen ? (
         <Modal handleClick={() => setAddOptionOpen(false)}>
-          <div>
-            <h2>Add Option</h2>
+          <form className={formStyles.form}>
+            <h1>Add Option</h1>
+            <p>ID</p>
+            <input
+              placeholder="ID"
+              onChange={(e) => setOptionId(e.target.value.trim())}
+            />
+            <p>English Name</p>
+            <input
+              placeholder="English Name"
+              onChange={(e) => setEnglishName(e.target.value.trim())}
+            />
+            <p>Korean Name</p>
+            <input
+              placeholder="Korean Name"
+              onChange={(e) => setKoreanName(e.target.value)}
+            />
+            <p>Price</p>
+            <input
+              placeholder="Price"
+              onChange={(e) => setPrice(e.target.value.trim())}
+            />
+          </form>
+          <div className={formStyles.buttons}>
+            <button onClick={() => handleAddCategoryClose()}>Close</button>
+            <button
+              type="submit"
+              form="addOptionCategory"
+              disabled={addOptionCategoryDisabled}
+            >
+              Add
+            </button>
           </div>
         </Modal>
       ) : null}

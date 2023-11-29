@@ -2,7 +2,7 @@
 
 import listStyles from '../../styles/list.module.css'
 import tableStyles from '../../styles/tables.module.css'
-import modalStyles from '../../styles/modal.module.css'
+import formStyles from '../../styles/form.module.css'
 import { useState, useEffect, useContext } from 'react'
 import { Table } from '../../utils/types'
 import {
@@ -55,11 +55,11 @@ export default function Tables() {
   const addDisabled = id === '' || tableNumber === '' || idExists(id)
 
   //Modal Scroll
-  if (editOpen || addOpen) {
-    document.body.classList.add(modalStyles.activeModal)
-  } else {
-    document.body.classList.remove(modalStyles.activeModal)
-  }
+  // if (editOpen || addOpen) {
+  //   document.body.classList.add(modalStyles.activeModal)
+  // } else {
+  //   document.body.classList.remove(modalStyles.activeModal)
+  // }
 
   function idExists(id: string) {
     if (tables) {
@@ -72,14 +72,14 @@ export default function Tables() {
     }
   }
 
-  function handleEdit(table: Table) {
+  function handleEditOpen(table: Table) {
     setEditTable(table)
     setNewId(table.id)
     setNewTableNumber(table.tableNumber)
     setEditOpen(true)
   }
 
-  function handleAddModalClose() {
+  function handleAddClose() {
     setAddOpen(false)
     setId('')
     setTableNumber('')
@@ -127,7 +127,7 @@ export default function Tables() {
     const newTables = await getAllTables(store)
     setTables(newTables)
 
-    handleAddModalClose()
+    handleAddClose()
   }
 
   if (!(tables && store)) {
@@ -142,7 +142,7 @@ export default function Tables() {
       {tables?.map((table) => (
         <div className={listStyles.item}>
           <p className={listStyles.name}>Table {table.tableNumber}</p>
-          <FaPencilAlt onClick={() => handleEdit(table)} />
+          <FaPencilAlt onClick={() => handleEditOpen(table)} />
         </div>
       ))}
 
@@ -158,7 +158,7 @@ export default function Tables() {
             <form
               id="editTableForm"
               onSubmit={(e) => edit(e, editTable, newId, newTableNumber, store)}
-              className={modalStyles.form}
+              className={formStyles.form}
             >
               <h1>Edit Table</h1>
               <p>ID</p>
@@ -181,14 +181,14 @@ export default function Tables() {
               />
 
               {editTable?.id !== newId && idExists(newId) ? (
-                <p className={modalStyles.message}>
+                <p className={formStyles.message}>
                   Table with id {newId} already exists!
                 </p>
               ) : null}
             </form>
           ) : null}
 
-          <div className={modalStyles.buttons}>
+          <div className={formStyles.buttons}>
             <button onClick={() => setEditOpen(false)}>Close</button>
             {editTable ? (
               <button onClick={() => handleDelete(editTable, store)}>
@@ -204,11 +204,11 @@ export default function Tables() {
 
       {/* Add Modal */}
       {addOpen ? (
-        <Modal handleClick={handleAddModalClose}>
+        <Modal handleClick={handleAddClose}>
           <form
             id="addTableForm"
             onSubmit={(e) => add(e, store)}
-            className={modalStyles.form}
+            className={formStyles.form}
           >
             <h1>Add Table</h1>
             <p>ID *</p>
@@ -225,14 +225,14 @@ export default function Tables() {
             />
 
             {idExists(id) ? (
-              <p className={modalStyles.message}>
+              <p className={formStyles.message}>
                 Table with id {id} already exists!
               </p>
             ) : null}
           </form>
 
-          <div className={modalStyles.buttons}>
-            <button onClick={handleAddModalClose}>Close</button>
+          <div className={formStyles.buttons}>
+            <button onClick={handleAddClose}>Close</button>
             <button type="submit" form="addTableForm" disabled={addDisabled}>
               Add
             </button>

@@ -9,22 +9,12 @@ import {
   orderBy,
   DocumentData,
   where,
-  limit,
   addDoc,
-  writeBatch,
   updateDoc,
   deleteDoc,
   setDoc,
 } from 'firebase/firestore'
-import {
-  Category,
-  Menu,
-  Table,
-  Option,
-  Options,
-  OrderHeader,
-  OrderDetail,
-} from './types'
+import { Category, Menu, Table, Option, Options } from './types'
 import { getAuth } from 'firebase/auth'
 
 //Firebase Setup
@@ -197,6 +187,16 @@ export async function getMenu(store: string, category: string, id: string) {
   const menu = snapshot.data() as Menu
 
   return menu
+}
+
+//Menus Post
+export async function postMenu(store: string, menu: Menu) {
+  const menusRef = doc(
+    doc(db, 'menus', store),
+    'menus',
+    `${menu.category}-${menu.id}`
+  )
+  await setDoc(menusRef, menu)
 }
 
 //Options Get
