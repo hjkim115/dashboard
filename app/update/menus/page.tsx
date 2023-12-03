@@ -282,26 +282,26 @@ export default function Menus() {
                   type="text"
                   placeholder="ID"
                 />
-                <p>Category *</p>
+                <p>Category*</p>
                 <select onChange={(e) => setCategory(e.target.value)}>
                   <option value="">Select Category!</option>
                   {categories.map((category) => (
                     <option value={category.id}>{category.englishName}</option>
                   ))}
                 </select>
-                <p>Korean Name *</p>
+                <p>Korean Name*</p>
                 <input
                   onChange={(e) => setKoreanName(e.target.value.trim())}
                   type="text"
                   placeholder="Korean Name"
                 />
-                <p>English Name *</p>
+                <p>English Name*</p>
                 <input
                   onChange={(e) => setEnglishName(e.target.value.trim())}
                   type="text"
                   placeholder="English Name"
                 />
-                <p>Price *</p>
+                <p>Price*</p>
                 <input
                   onChange={(e) => setPrice(e.target.value.trim())}
                   type="text"

@@ -412,7 +412,7 @@ export default function menu() {
 
   let editOptionDisabled
 
-  if (options && editOption) {
+  if (options && editOption && editOptionOpen) {
     editOptionDisabled =
       newOptionId === '' ||
       newOptionEnglishName === '' ||
@@ -810,8 +810,7 @@ export default function menu() {
               </p>
             ) : null}
 
-            {editOption &&
-            editOption.id !== newOptionId &&
+            {editOption.id !== newOptionId &&
             optionExists(options, editOption.category, newOptionId) ? (
               <p className={formStyles.message}>
                 {editOption.category} with id {newOptionId} already exists!
