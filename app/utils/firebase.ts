@@ -13,6 +13,7 @@ import {
   updateDoc,
   deleteDoc,
   setDoc,
+  writeBatch,
 } from 'firebase/firestore'
 import { Category, Menu, Table, Option, Options } from './types'
 import { getAuth } from 'firebase/auth'
@@ -182,21 +183,109 @@ export async function getAllMenus(store: string) {
 
 //Menu Get
 export async function getMenu(store: string, category: string, id: string) {
-  const menuRef = doc(doc(db, 'menus', store), 'menus', `${category}-${id}`)
-  const snapshot = await getDoc(menuRef)
-  const menu = snapshot.data() as Menu
+  const menusRef = collection(doc(db, 'menus', store), 'menus')
+  const menusQuery = query(
+    menusRef,
+    where('category', '==', category),
+    where('id', '==', id)
+  )
+  const snapshot = await getDocs(menusQuery)
 
-  return menu
+  const menus: Menu[] = []
+  snapshot.forEach((document) => {
+    menus.push(document.data() as Menu)
+  })
+
+  return menus[0]
 }
 
 //Menus Post
 export async function postMenu(store: string, menu: Menu) {
-  const menusRef = doc(
-    doc(db, 'menus', store),
-    'menus',
-    `${menu.category}-${menu.id}`
+  const menusRef = collection(doc(db, 'menus', store), 'menus')
+  await addDoc(menusRef, menu)
+}
+
+//Menu Update
+export async function updateMenu(
+  store: string,
+  id: string,
+  category: string,
+  values: any
+) {
+  const menusRef = collection(doc(db, 'menus', store), 'menus')
+  const menusQuery = query(
+    menusRef,
+    where('id', '==', id),
+    where('category', '==', category)
   )
-  await setDoc(menusRef, menu)
+
+  const menusSnapshot = await getDocs(menusQuery)
+  const menuRefIds: string[] = []
+  menusSnapshot.forEach((document) => {
+    menuRefIds.push(document.id)
+  })
+
+  updateDoc(doc(doc(db, 'menus', store), 'menus', menuRefIds[0]), values)
+
+  if (values.id || values.category) {
+    const optionsRef = collection(doc(db, 'options', store), 'options')
+    const optionsQuery = query(
+      optionsRef,
+      where('menuId', '==', id),
+      where('menuCategory', '==', category)
+    )
+
+    const optionsSnapshot = await getDocs(optionsQuery)
+    const optionRefIds: string[] = []
+    optionsSnapshot.forEach((document) => {
+      optionRefIds.push(document.id)
+    })
+
+    const batch = writeBatch(db)
+    for (let optionRefId of optionRefIds) {
+      batch.update(doc(doc(db, 'options', store), 'options', optionRefId), {
+        menuId: values.id,
+        menuCategory: values.category,
+      })
+    }
+    await batch.commit()
+  }
+}
+
+export async function deleteMenu(store: string, id: string, category: string) {
+  const menusRef = collection(doc(db, 'menus', store), 'menus')
+  const menusQuery = query(
+    menusRef,
+    where('id', '==', id),
+    where('category', '==', category)
+  )
+
+  const menusSnapshot = await getDocs(menusQuery)
+  const menuRefIds: string[] = []
+  menusSnapshot.forEach((document) => {
+    menuRefIds.push(document.id)
+  })
+
+  deleteDoc(doc(doc(db, 'menus', store), 'menus', menuRefIds[0]))
+
+  const optionsRef = collection(doc(db, 'options', store), 'options')
+  const optionsQuery = query(
+    optionsRef,
+    where('menuId', '==', id),
+    where('menuCategory', '==', category)
+  )
+
+  const optionsSnapshot = await getDocs(optionsQuery)
+  const optionRefIds: string[] = []
+  optionsSnapshot.forEach((document) => {
+    optionRefIds.push(document.id)
+  })
+
+  const batch = writeBatch(db)
+  for (let optionRefId of optionRefIds) {
+    batch.delete(doc(doc(db, 'options', store), 'options', optionRefId))
+  }
+  await batch.commit()
 }
 
 //Options Get
@@ -224,4 +313,119 @@ export async function getOptions(store: string, category: string, id: string) {
   }
 
   return options
+}
+
+//Option Post
+export async function postOption(store: string, option: Option) {
+  const optionsRef = collection(doc(db, 'options', store), 'options')
+  await addDoc(optionsRef, option)
+}
+
+//Update Option Category
+export async function updateOptionCategory(
+  store: string,
+  category: string,
+  id: string,
+  optionCategory: string,
+  newCategory: string
+) {
+  const optionsRef = collection(doc(db, 'options', store), 'options')
+  const optionsQuery = query(
+    optionsRef,
+    where('menuCategory', '==', category),
+    where('menuId', '==', id),
+    where('category', '==', optionCategory)
+  )
+  const snapshot = await getDocs(optionsQuery)
+  const refIds: string[] = []
+  snapshot.forEach((document) => {
+    refIds.push(document.id)
+  })
+
+  const batch = writeBatch(db)
+
+  for (const refId of refIds) {
+    const optionRef = doc(doc(db, 'options', store), 'options', refId)
+    batch.update(optionRef, { category: newCategory })
+  }
+
+  await batch.commit()
+}
+
+//Delete Option Category
+export async function deleteOptionCategory(
+  store: string,
+  category: string,
+  id: string,
+  optionCategory: string
+) {
+  const optionsRef = collection(doc(db, 'options', store), 'options')
+  const optionsQuery = query(
+    optionsRef,
+    where('menuCategory', '==', category),
+    where('menuId', '==', id),
+    where('category', '==', optionCategory)
+  )
+  const snapshot = await getDocs(optionsQuery)
+  const refIds: string[] = []
+  snapshot.forEach((document) => {
+    refIds.push(document.id)
+  })
+
+  const batch = writeBatch(db)
+
+  for (const refId of refIds) {
+    const optionRef = doc(doc(db, 'options', store), 'options', refId)
+    batch.delete(optionRef)
+  }
+
+  await batch.commit()
+}
+
+//Update Option
+export async function updateOption(
+  store: string,
+  optionCategory: string,
+  optionId: string,
+  newOption: Option
+) {
+  const optionsRef = collection(doc(db, 'options', store), 'options')
+  const optionsQuery = query(
+    optionsRef,
+    where('category', '==', optionCategory),
+    where('id', '==', optionId)
+  )
+
+  const snapshot = await getDocs(optionsQuery)
+  const refIds: string[] = []
+  snapshot.forEach((document) => {
+    refIds.push(document.id)
+  })
+
+  await updateDoc(
+    doc(doc(db, 'options', store), 'options', refIds[0]),
+    newOption
+  )
+}
+
+//Delete Option
+export async function deleteOption(
+  store: string,
+  optionCategory: string,
+  optionId: string
+) {
+  const optionsRef = collection(doc(db, 'options', store), 'options')
+  const optionsQuery = query(
+    optionsRef,
+    where('category', '==', optionCategory),
+    where('id', '==', optionId)
+  )
+
+  const snapshot = await getDocs(optionsQuery)
+  const refIds: string[] = []
+  snapshot.forEach((document) => {
+    refIds.push(document.id)
+  })
+
+  await deleteDoc(doc(doc(db, 'options', store), 'options', refIds[0]))
 }

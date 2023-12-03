@@ -62,7 +62,7 @@ export default function Menus() {
       return true
     }
 
-    if (idCategoryExists(menus, id, category)) {
+    if (menuExists(menus, id, category)) {
       return true
     }
 
@@ -73,7 +73,7 @@ export default function Menus() {
     return false
   }
 
-  function idCategoryExists(menus: Menu[], id: string, category: string) {
+  function menuExists(menus: Menu[], id: string, category: string) {
     for (const menu of menus) {
       if (menu.id === id && menu.category === category) {
         return true
@@ -181,7 +181,7 @@ export default function Menus() {
 
     //Get Presigned Upload url
     const uploadUrlRes = await fetch(
-      `${server}/api/uploadUrl?fileName=${category}-${id}.png&store=${store}`
+      `${server}/api/uploadUrl?fileName=${category}-${id}.${image.type}&store=${store}`
     )
     const uploadUrl = await uploadUrlRes.json()
 
@@ -202,7 +202,7 @@ export default function Menus() {
       koreanName: koreanName,
       englishName: englishName,
       price: Number(price),
-      imageName: `${category}-${id}.png`,
+      imageName: `${category}-${id}.${image.type}`,
     }
 
     if (description !== '') {
@@ -251,7 +251,9 @@ export default function Menus() {
           </p>
           <FaPencilAlt
             onClick={() =>
-              router.push(`/update/menus/${menu.id}?category=${menu.category}`)
+              router.push(
+                `/update/editMenu?id=${menu.id}&category=${menu.category}`
+              )
             }
           />
         </div>
@@ -321,7 +323,7 @@ export default function Menus() {
                   type="file"
                 />
 
-                {idCategoryExists(menus, id, category) ? (
+                {menuExists(menus, id, category) ? (
                   <p className={formStyles.message}>
                     Menu with category {category}, id {id} already exists!
                   </p>

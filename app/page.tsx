@@ -12,9 +12,9 @@ import { useRouter } from 'next/navigation'
 import LoadingPage from './components/LoadingPage'
 import { AuthContext } from './context/AuthContext'
 import LogIn from './components/LogIn'
+import { CompanyNameContext } from './context/CompanyNameContext'
 
 export default function Home() {
-  const [companyName, setCompanyName] = useState<string | null>(null)
   const [counts, setCounts] = useState<number[] | null>(null)
 
   const router = useRouter()
@@ -22,12 +22,9 @@ export default function Home() {
   const { user } = useContext(AuthContext)
   const store = user?.displayName
 
-  useEffect(() => {
-    async function fetchCompanyName(store: string) {
-      const data = await getCompanyName(store)
-      setCompanyName(data)
-    }
+  const { companyName } = useContext(CompanyNameContext)
 
+  useEffect(() => {
     async function fetchCounts(store: string) {
       const categoryCount = (await getAllCategories(store)).length
       const menuCount = (await getAllMenus(store)).length
@@ -37,7 +34,6 @@ export default function Home() {
     }
 
     if (store) {
-      fetchCompanyName(store)
       fetchCounts(store)
     }
   }, [store])
