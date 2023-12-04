@@ -50,7 +50,7 @@ export default function Categories() {
   }, [store])
 
   // Disabled
-  const editDisabled =
+  let editDisabled =
     (editCategory?.id === newId &&
       editCategory?.englishName === newEnglishName &&
       editCategory?.koreanName === newKoreanName) ||
@@ -60,7 +60,7 @@ export default function Categories() {
     idExists(newId) ||
     !pattern.test(newId)
 
-  const addDisabled =
+  let addDisabled =
     id === '' ||
     englishName === '' ||
     koreanName === '' ||
@@ -93,8 +93,8 @@ export default function Categories() {
     setEditOpen(true)
   }
 
-  function handleAddModalClose() {
-    setAddOpen(false)
+  function handleAddOpen() {
+    setAddOpen(true)
     setId('')
     setEnglishName('')
     setKoreanName('')
@@ -109,7 +109,6 @@ export default function Categories() {
     store: string
   ) {
     e.preventDefault()
-
     setEditOpen(false)
 
     const newCategory: Category = {
@@ -139,12 +138,11 @@ export default function Categories() {
       englishName: englishName,
       koreanName: koreanName,
     }
+    setAddOpen(false)
     await postCategory(store, category)
 
     const newCategories = await getAllCategories(store)
     setCategories(newCategories)
-
-    handleAddModalClose()
   }
 
   if (!(categories && store)) {
@@ -164,7 +162,7 @@ export default function Categories() {
       ))}
 
       {/* Add Menu */}
-      <AddItem handleClick={setAddOpen}>
+      <AddItem handleClick={handleAddOpen}>
         <FaPlus /> Add Category
       </AddItem>
 
@@ -256,7 +254,7 @@ export default function Categories() {
 
       {/* Add Modal */}
       {addOpen ? (
-        <Modal handleClick={handleAddModalClose}>
+        <Modal handleClick={() => setAddOpen(false)}>
           <form
             id="addCategoryForm"
             onSubmit={(e) => add(e, store)}
@@ -296,7 +294,7 @@ export default function Categories() {
           </form>
 
           <div className={formStyles.buttons}>
-            <button onClick={handleAddModalClose}>Close</button>
+            <button onClick={() => setAddOpen(false)}>Close</button>
             <button type="submit" form="addCategoryForm" disabled={addDisabled}>
               Add
             </button>

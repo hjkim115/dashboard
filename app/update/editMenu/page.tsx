@@ -22,7 +22,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import LoadingPage from '@/app/components/LoadingPage'
 import { FaPlus, FaAngleDown, FaAngleUp, FaPencilAlt } from 'react-icons/fa'
 import Modal from '@/app/components/Modal'
-import Menus from '../menus/page'
+import { server } from '@/app/utils/config'
 
 export default function menu() {
   const [menus, setMenus] = useState<Menu[] | null>(null)
@@ -112,11 +112,11 @@ export default function menu() {
       !newEnglishName ||
       !newKoreanName ||
       !newPrice ||
-      !newDescription ||
       !isPriceValid(newPrice) ||
       !idPattern.test(newId) ||
       menuEquals(menu) ||
-      menuExists(menus, newId, newCategory)
+      ((menu.id !== newId || menu.category !== newCategory) &&
+        menuExists(menus, newId, newCategory))
   }
 
   async function handleMenuEdit(
@@ -127,6 +127,7 @@ export default function menu() {
     menu: Menu
   ) {
     e.preventDefault()
+    editMenuDisabled = true
 
     const values: { [id: string]: any } = {}
 
@@ -193,6 +194,47 @@ export default function menu() {
     return false
   }
 
+  //Edit Image
+  const [editImageOpen, setEditImageOpen] = useState(false)
+  const [newImage, setNewImage] = useState<File | null>(null)
+
+  function handleEditImageOpen() {
+    setNewImage(null)
+    setEditImageOpen(true)
+  }
+
+  async function handleImageEdit(
+    e: React.FormEvent<HTMLFormElement>,
+    newImage: File
+  ) {
+    e.preventDefault()
+
+    const typeToExtensions: { [id: string]: string } = {
+      'image/jpg': 'jpg',
+      'image/jpeg': 'jpeg',
+      'image/png': 'png',
+    }
+    setEditImageOpen(false)
+
+    //Get Presigned Upload url
+    const uploadUrlRes = await fetch(
+      `${server}/api/uploadUrl?fileName=${category}-${id}.${
+        typeToExtensions[newImage.type]
+      }&store=${store}`
+    )
+    const uploadUrl = await uploadUrlRes.json()
+
+    //Upload Image
+    await fetch(uploadUrl, {
+      method: 'PUT',
+      body: newImage,
+      headers: {
+        'Content-Type': newImage?.type,
+        'Content-Length': newImage?.size.toString(),
+      },
+    })
+  }
+
   //Add Category
   const [addCategoryOpen, setAddCategoryOpen] = useState(false)
   const [addCategory, setaddCategory] = useState('')
@@ -245,6 +287,7 @@ export default function menu() {
     id: string
   ) {
     e.preventDefault()
+    setEditCategoryOpen(false)
 
     if (options[editCategory].length <= 0) {
       const newOptions = { ...options }
@@ -265,8 +308,6 @@ export default function menu() {
       const newOptions = await getOptions(store, category, id)
       setOptions(newOptions)
     }
-
-    setAddCategoryOpen(false)
   }
 
   async function handleDeleteOptionCategory(
@@ -278,6 +319,8 @@ export default function menu() {
     if (!confirm('Are you sure you want to delete this category?')) {
       return
     }
+
+    setEditCategoryOpen(false)
     if (options[editCategory].length <= 0) {
       const newOptions = { ...options }
       delete newOptions[editCategory]
@@ -289,8 +332,6 @@ export default function menu() {
       const newOptions = await getOptions(store, category, id)
       setOptions(newOptions)
     }
-
-    setEditCategoryOpen(false)
   }
 
   //Add Option
@@ -303,16 +344,11 @@ export default function menu() {
 
   function handleAddOptionOpen(selectedOptionCategory: string) {
     setOptionCategory(selectedOptionCategory)
-    setAddOptionOpen(true)
-  }
-
-  function handleAddOptionClose() {
-    setAddOptionOpen(false)
-    setOptionCategory('')
     setOptionId('')
     setEnglishName('')
     setKoreanName('')
     setPrice('')
+    setAddOptionOpen(true)
   }
 
   async function addOption(
@@ -322,6 +358,8 @@ export default function menu() {
     category: string
   ) {
     e.preventDefault()
+    setAddOptionOpen(false)
+    setOptionCategory('')
 
     const option: Option = {
       id: optionId,
@@ -337,12 +375,11 @@ export default function menu() {
 
     const newOptions = await getOptions(store, category, id)
     setOptions(newOptions)
-    handleAddOptionClose()
   }
 
   let addOptionDisabled
 
-  if (options) {
+  if (options && optionCategory) {
     addOptionDisabled =
       optionId === '' ||
       optionCategory === '' ||
@@ -585,13 +622,15 @@ export default function menu() {
           <button onClick={() => handleMenuDelete(store, id, category)}>
             Delete
           </button>
+          <button onClick={handleEditImageOpen}>Edit Image</button>
           <button type="submit" form="editMenuForm" disabled={editMenuDisabled}>
-            Update
+            Edit
           </button>
         </div>
       </div>
 
-      <h2 className={detailsStyles.options}>Options</h2>
+      {/* Option */}
+      <h2 className={detailsStyles.label}>Options</h2>
 
       <div className={detailsStyles.categoriesLabel}>
         <p>Categories</p>
@@ -641,6 +680,45 @@ export default function menu() {
             : null}
         </div>
       ))}
+
+      {editImageOpen ? (
+        <Modal handleClick={() => setEditImageOpen(false)}>
+          <form
+            onSubmit={(e) => handleImageEdit(e, newImage as File)}
+            id="editImageForm"
+            className={formStyles.form}
+          >
+            <h1>Edit Image</h1>
+            <div
+              style={{
+                backgroundImage: `url('${process.env.NEXT_PUBLIC_CLOUD_FRONT_URL}/${store}/${menu.imageName}')`,
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: 'contain',
+                width: '100%',
+                height: '30vh',
+                margin: '0.5rem',
+              }}
+            />
+            <p>Image*</p>
+            <input
+              onChange={(e) => {
+                if (e.target.files) {
+                  setNewImage(e.target.files[0])
+                }
+              }}
+              type="file"
+              accept=".jpg, .jpeg, .png"
+            />
+          </form>
+          <div className={formStyles.buttons}>
+            <button onClick={() => setEditImageOpen(false)}>Close</button>
+            <button type="submit" form="editImageForm" disabled={!newImage}>
+              Edit
+            </button>
+          </div>
+        </Modal>
+      ) : null}
 
       {addCategoryOpen ? (
         <Modal handleClick={() => setAddCategoryOpen(false)}>
@@ -762,7 +840,7 @@ export default function menu() {
             ) : null}
           </form>
           <div className={formStyles.buttons}>
-            <button onClick={handleAddOptionClose}>Close</button>
+            <button onClick={() => setAddOptionOpen(false)}>Close</button>
             <button
               type="submit"
               form="addOptionForm"

@@ -79,8 +79,8 @@ export default function Tables() {
     setEditOpen(true)
   }
 
-  function handleAddClose() {
-    setAddOpen(false)
+  function handleAddOpen() {
+    setAddOpen(true)
     setId('')
     setTableNumber('')
   }
@@ -122,12 +122,11 @@ export default function Tables() {
       id: id,
       tableNumber: tableNumber,
     }
+    setAddOpen(false)
     await postTable(store, table)
 
     const newTables = await getAllTables(store)
     setTables(newTables)
-
-    handleAddClose()
   }
 
   if (!(tables && store)) {
@@ -147,7 +146,7 @@ export default function Tables() {
       ))}
 
       {/* Add Menu */}
-      <AddItem handleClick={setAddOpen}>
+      <AddItem handleClick={handleAddOpen}>
         <FaPlus /> Add Table
       </AddItem>
 
@@ -204,7 +203,7 @@ export default function Tables() {
 
       {/* Add Modal */}
       {addOpen ? (
-        <Modal handleClick={handleAddClose}>
+        <Modal handleClick={() => setAddOpen(false)}>
           <form
             id="addTableForm"
             onSubmit={(e) => add(e, store)}
@@ -232,7 +231,7 @@ export default function Tables() {
           </form>
 
           <div className={formStyles.buttons}>
-            <button onClick={handleAddClose}>Close</button>
+            <button onClick={() => setAddOpen(false)}>Close</button>
             <button type="submit" form="addTableForm" disabled={addDisabled}>
               Add
             </button>

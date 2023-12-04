@@ -149,8 +149,8 @@ export default function Menus() {
     return selectedCategory === menu.category
   }
 
-  function handleAddClose() {
-    setAddOpen(false)
+  function handleAddOpen() {
+    setAddOpen(true)
     setId('')
     setCategory('')
     setEnglishName('')
@@ -170,18 +170,27 @@ export default function Menus() {
     return false
   }
 
-  async function add(e: React.FormEvent<HTMLFormElement>, store: string) {
+  async function add(
+    e: React.FormEvent<HTMLFormElement>,
+    store: string,
+    image: File
+  ) {
     e.preventDefault()
+    setAddOpen(false)
 
-    if (!image) {
-      return
+    const typeToExtensions: { [id: string]: string } = {
+      'image/jpg': 'jpg',
+      'image/jpeg': 'jpeg',
+      'image/png': 'png',
     }
 
     setAddLoading(true)
 
     //Get Presigned Upload url
     const uploadUrlRes = await fetch(
-      `${server}/api/uploadUrl?fileName=${category}-${id}.${image.type}&store=${store}`
+      `${server}/api/uploadUrl?fileName=${category}-${id}.${
+        typeToExtensions[image.type]
+      }&store=${store}`
     )
     const uploadUrl = await uploadUrlRes.json()
 
@@ -215,7 +224,6 @@ export default function Menus() {
     setMenus(newMenus)
 
     setAddLoading(false)
-    handleAddClose()
   }
 
   if (!(categories && menus && store)) {
@@ -260,19 +268,19 @@ export default function Menus() {
       ))}
 
       {/* Add Menu */}
-      <AddItem handleClick={setAddOpen}>
+      <AddItem handleClick={handleAddOpen}>
         <FaPlus /> Add Menu
       </AddItem>
 
       {/* Add Modal */}
       {addOpen ? (
-        <Modal handleClick={handleAddClose}>
+        <Modal handleClick={() => setAddOpen(false)}>
           {/* Form */}
           {!addLoading ? (
             <>
               <form
                 id="addMenuForm"
-                onSubmit={(e) => add(e, store)}
+                onSubmit={(e) => add(e, store, image as File)}
                 className={formStyles.form}
               >
                 <h1>Add Menu</h1>
@@ -321,6 +329,7 @@ export default function Menus() {
                     }
                   }}
                   type="file"
+                  accept=".jpg, .jpeg, .png"
                 />
 
                 {menuExists(menus, id, category) ? (
@@ -344,7 +353,7 @@ export default function Menus() {
 
               {/* Buttons */}
               <div className={formStyles.buttons}>
-                <button onClick={handleAddClose}>Close</button>
+                <button onClick={() => setAddOpen(false)}>Close</button>
                 <button type="submit" form="addMenuForm" disabled={addDisabled}>
                   Add
                 </button>
