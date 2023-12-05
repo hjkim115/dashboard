@@ -54,13 +54,6 @@ export default function Tables() {
 
   const addDisabled = id === '' || tableNumber === '' || idExists(id)
 
-  //Modal Scroll
-  // if (editOpen || addOpen) {
-  //   document.body.classList.add(modalStyles.activeModal)
-  // } else {
-  //   document.body.classList.remove(modalStyles.activeModal)
-  // }
-
   function idExists(id: string) {
     if (tables) {
       for (const table of tables) {
@@ -138,9 +131,11 @@ export default function Tables() {
       <h1>Tables</h1>
       {tables ? <Label /> : null}
 
-      {tables?.map((table) => (
+      {tables?.map((table, i) => (
         <div className={listStyles.item}>
-          <p className={listStyles.name}>Table {table.tableNumber}</p>
+          <p className={listStyles.name}>
+            {i + 1}. Table {table.tableNumber}
+          </p>
           <FaPencilAlt onClick={() => handleEditOpen(table)} />
         </div>
       ))}
@@ -151,93 +146,103 @@ export default function Tables() {
       </AddItem>
 
       {/* Edit Modal */}
-      {editOpen ? (
-        <Modal handleClick={() => setEditOpen(false)}>
-          {editTable ? (
+      <Modal handleClick={() => setEditOpen(false)} isOpen={editOpen}>
+        {editOpen ? (
+          <>
+            {editTable ? (
+              <form
+                id="editTableForm"
+                onSubmit={(e) =>
+                  edit(e, editTable, newId, newTableNumber, store)
+                }
+                className={formStyles.form}
+              >
+                <h1>Edit Table</h1>
+                <p>ID</p>
+                <input
+                  style={editTable?.id !== newId ? { color: 'red' } : undefined}
+                  onChange={(e) => setNewId(e.target.value.trim())}
+                  defaultValue={newId ? newId : undefined}
+                  type="text"
+                />
+                <p>Table Number</p>
+                <input
+                  style={
+                    editTable?.tableNumber !== newTableNumber
+                      ? { color: 'red' }
+                      : undefined
+                  }
+                  onChange={(e) => setNewTableNumber(e.target.value.trim())}
+                  defaultValue={newTableNumber ? newTableNumber : undefined}
+                  type="text"
+                />
+
+                {editTable?.id !== newId && idExists(newId) ? (
+                  <p className={formStyles.message}>
+                    Table with id {newId} already exists!
+                  </p>
+                ) : null}
+              </form>
+            ) : null}
+
+            <div className={formStyles.buttons}>
+              <button onClick={() => setEditOpen(false)}>Close</button>
+              {editTable ? (
+                <button onClick={() => handleDelete(editTable, store)}>
+                  Delete
+                </button>
+              ) : null}
+              <button
+                type="submit"
+                form="editTableForm"
+                disabled={editDisabled}
+              >
+                Edit
+              </button>
+            </div>
+          </>
+        ) : null}
+      </Modal>
+
+      {/* Add Modal */}
+      <Modal handleClick={() => setAddOpen(false)} isOpen={addOpen}>
+        {addOpen ? (
+          <>
             <form
-              id="editTableForm"
-              onSubmit={(e) => edit(e, editTable, newId, newTableNumber, store)}
+              id="addTableForm"
+              onSubmit={(e) => add(e, store)}
               className={formStyles.form}
             >
-              <h1>Edit Table</h1>
-              <p>ID</p>
+              <h1>Add Table</h1>
+              <p>ID *</p>
               <input
-                style={editTable?.id !== newId ? { color: 'red' } : undefined}
-                onChange={(e) => setNewId(e.target.value.trim())}
-                defaultValue={newId ? newId : undefined}
+                onChange={(e) => setId(e.target.value.trim())}
                 type="text"
+                placeholder="ID"
               />
-              <p>Table Number</p>
+              <p>Table Number *</p>
               <input
-                style={
-                  editTable?.tableNumber !== newTableNumber
-                    ? { color: 'red' }
-                    : undefined
-                }
-                onChange={(e) => setNewTableNumber(e.target.value.trim())}
-                defaultValue={newTableNumber ? newTableNumber : undefined}
+                onChange={(e) => setTableNumber(e.target.value.trim())}
                 type="text"
+                placeholder="Table Number"
               />
 
-              {editTable?.id !== newId && idExists(newId) ? (
+              {idExists(id) ? (
                 <p className={formStyles.message}>
-                  Table with id {newId} already exists!
+                  Table with id {id} already exists!
                 </p>
               ) : null}
             </form>
-          ) : null}
 
-          <div className={formStyles.buttons}>
-            <button onClick={() => setEditOpen(false)}>Close</button>
-            {editTable ? (
-              <button onClick={() => handleDelete(editTable, store)}>
-                Delete
+            <div className={formStyles.buttons}>
+              <button onClick={() => setAddOpen(false)}>Close</button>
+              <button type="submit" form="addTableForm" disabled={addDisabled}>
+                Add
               </button>
-            ) : null}
-            <button type="submit" form="editTableForm" disabled={editDisabled}>
-              Edit
-            </button>
-          </div>
-        </Modal>
-      ) : null}
-
-      {/* Add Modal */}
-      {addOpen ? (
-        <Modal handleClick={() => setAddOpen(false)}>
-          <form
-            id="addTableForm"
-            onSubmit={(e) => add(e, store)}
-            className={formStyles.form}
-          >
-            <h1>Add Table</h1>
-            <p>ID *</p>
-            <input
-              onChange={(e) => setId(e.target.value.trim())}
-              type="text"
-              placeholder="ID"
-            />
-            <p>Table Number *</p>
-            <input
-              onChange={(e) => setTableNumber(e.target.value.trim())}
-              type="text"
-              placeholder="Table Number"
-            />
-
-            {idExists(id) ? (
-              <p className={formStyles.message}>
-                Table with id {id} already exists!
-              </p>
-            ) : null}
-          </form>
-
-          <div className={formStyles.buttons}>
-            <button onClick={() => setAddOpen(false)}>Close</button>
-            <button type="submit" form="addTableForm" disabled={addDisabled}>
-              Add
-            </button>
-          </div>
-        </Modal>
-      ) : null}
+            </div>
+          </>
+        ) : null}
+      </Modal>
     </div>
   )
 }

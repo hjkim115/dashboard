@@ -30,7 +30,7 @@ export default function Menus() {
   const [description, setDescription] = useState('')
   const [image, setImage] = useState<File | null>(null)
 
-  const [addLoading, setAddLoading] = useState(false)
+  const [imageUploadLoading, setImageUploadLoading] = useState(false)
 
   const router = useRouter()
 
@@ -170,6 +170,17 @@ export default function Menus() {
     return false
   }
 
+  function getCategoryName(categories: Category[]) {
+    let name
+    for (const category of categories) {
+      if (category.id === selectedCategory) {
+        name = category.englishName
+      }
+    }
+
+    return name
+  }
+
   async function add(
     e: React.FormEvent<HTMLFormElement>,
     store: string,
@@ -177,14 +188,13 @@ export default function Menus() {
   ) {
     e.preventDefault()
     setAddOpen(false)
+    setImageUploadLoading(true)
 
     const typeToExtensions: { [id: string]: string } = {
       'image/jpg': 'jpg',
       'image/jpeg': 'jpeg',
       'image/png': 'png',
     }
-
-    setAddLoading(true)
 
     //Get Presigned Upload url
     const uploadUrlRes = await fetch(
@@ -211,7 +221,7 @@ export default function Menus() {
       koreanName: koreanName,
       englishName: englishName,
       price: Number(price),
-      imageName: `${category}-${id}.${image.type}`,
+      imageName: `${category}-${id}.${typeToExtensions[image.type]}`,
     }
 
     if (description !== '') {
@@ -223,10 +233,10 @@ export default function Menus() {
     const newMenus = await getAllMenus(store)
     setMenus(newMenus)
 
-    setAddLoading(false)
+    setImageUploadLoading(false)
   }
 
-  if (!(categories && menus && store)) {
+  if (!(categories && menus && store) || imageUploadLoading) {
     return <LoadingPage />
   }
 
@@ -241,11 +251,11 @@ export default function Menus() {
         </select>
       </div>
 
-      <h1>Menus</h1>
+      <h1>{!selectedCategory ? 'All Menus' : getCategoryName(categories)}</h1>
       {/* Menus */}
       <Label />
 
-      {menus.filter(checkCategory).map((menu) => (
+      {menus.filter(checkCategory).map((menu, i) => (
         <div className={listStyles.item}>
           <p
             style={
@@ -255,7 +265,7 @@ export default function Menus() {
             }
             className={listStyles.name}
           >
-            {menu.englishName}
+            {i + 1}. {menu.englishName}
           </p>
           <FaPencilAlt
             onClick={() =>
@@ -273,97 +283,92 @@ export default function Menus() {
       </AddItem>
 
       {/* Add Modal */}
-      {addOpen ? (
-        <Modal handleClick={() => setAddOpen(false)}>
-          {/* Form */}
-          {!addLoading ? (
-            <>
-              <form
-                id="addMenuForm"
-                onSubmit={(e) => add(e, store, image as File)}
-                className={formStyles.form}
-              >
-                <h1>Add Menu</h1>
-                <p>ID *</p>
-                <input
-                  onChange={(e) => setId(e.target.value.trim())}
-                  type="text"
-                  placeholder="ID"
-                />
-                <p>Category*</p>
-                <select onChange={(e) => setCategory(e.target.value)}>
-                  <option value="">Select Category!</option>
-                  {categories.map((category) => (
-                    <option value={category.id}>{category.englishName}</option>
-                  ))}
-                </select>
-                <p>Korean Name*</p>
-                <input
-                  onChange={(e) => setKoreanName(e.target.value.trim())}
-                  type="text"
-                  placeholder="Korean Name"
-                />
-                <p>English Name*</p>
-                <input
-                  onChange={(e) => setEnglishName(e.target.value.trim())}
-                  type="text"
-                  placeholder="English Name"
-                />
-                <p>Price*</p>
-                <input
-                  onChange={(e) => setPrice(e.target.value.trim())}
-                  type="text"
-                  placeholder="Price"
-                />
-                <p>Description</p>
-                <textarea
-                  onChange={(e) => setDescription(e.target.value.trim())}
-                  rows={3}
-                  placeholder="Description"
-                />
-                <p>Image*</p>
-                <input
-                  onChange={(e) => {
-                    if (e.target.files) {
-                      setImage(e.target.files[0])
-                    }
-                  }}
-                  type="file"
-                  accept=".jpg, .jpeg, .png"
-                />
+      <Modal handleClick={() => setAddOpen(false)} isOpen={addOpen}>
+        {addOpen ? (
+          <>
+            <form
+              id="addMenuForm"
+              onSubmit={(e) => add(e, store, image as File)}
+              className={formStyles.form}
+            >
+              <h1>Add Menu</h1>
+              <p>ID *</p>
+              <input
+                onChange={(e) => setId(e.target.value.trim())}
+                type="text"
+                placeholder="ID"
+              />
+              <p>Category*</p>
+              <select onChange={(e) => setCategory(e.target.value)}>
+                <option value="">Select Category!</option>
+                {categories.map((category) => (
+                  <option value={category.id}>{category.englishName}</option>
+                ))}
+              </select>
+              <p>Korean Name*</p>
+              <input
+                onChange={(e) => setKoreanName(e.target.value.trim())}
+                type="text"
+                placeholder="Korean Name"
+              />
+              <p>English Name*</p>
+              <input
+                onChange={(e) => setEnglishName(e.target.value.trim())}
+                type="text"
+                placeholder="English Name"
+              />
+              <p>Price*</p>
+              <input
+                onChange={(e) => setPrice(e.target.value.trim())}
+                type="text"
+                placeholder="Price"
+              />
+              <p>Description</p>
+              <textarea
+                onChange={(e) => setDescription(e.target.value.trim())}
+                rows={3}
+                placeholder="Description"
+              />
+              <p>Image*</p>
+              <input
+                onChange={(e) => {
+                  if (e.target.files) {
+                    setImage(e.target.files[0])
+                  }
+                }}
+                type="file"
+                accept=".jpg, .jpeg, .png"
+              />
 
-                {menuExists(menus, id, category) ? (
-                  <p className={formStyles.message}>
-                    Menu with category {category}, id {id} already exists!
-                  </p>
-                ) : null}
+              {menuExists(menus, id, category) ? (
+                <p className={formStyles.message}>
+                  Menu with category {category}, id {id} already exists!
+                </p>
+              ) : null}
 
-                {id.length > 0 && !idPattern.test(id) ? (
-                  <p className={formStyles.message}>
-                    id should be alphanumeric{'('}a-z, A-Z, 0-9{')'}!
-                  </p>
-                ) : null}
+              {id.length > 0 && !idPattern.test(id) ? (
+                <p className={formStyles.message}>
+                  id should be alphanumeric{'('}a-z, A-Z, 0-9{')'}!
+                </p>
+              ) : null}
 
-                {price.length > 0 && !isPriceValid(price) ? (
-                  <p className={formStyles.message}>
-                    Price should be a number with a maximum of 2 decimal places!
-                  </p>
-                ) : null}
-              </form>
+              {price.length > 0 && !isPriceValid(price) ? (
+                <p className={formStyles.message}>
+                  Price should be a number with a maximum of 2 decimal places!
+                </p>
+              ) : null}
+            </form>
 
-              {/* Buttons */}
-              <div className={formStyles.buttons}>
-                <button onClick={() => setAddOpen(false)}>Close</button>
-                <button type="submit" form="addMenuForm" disabled={addDisabled}>
-                  Add
-                </button>
-              </div>
-            </>
-          ) : (
-            <LoadingPage />
-          )}
-        </Modal>
-      ) : null}
+            {/* Buttons */}
+            <div className={formStyles.buttons}>
+              <button onClick={() => setAddOpen(false)}>Close</button>
+              <button type="submit" form="addMenuForm" disabled={addDisabled}>
+                Add
+              </button>
+            </div>
+          </>
+        ) : null}
+      </Modal>
     </div>
   )
 }

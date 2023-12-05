@@ -92,7 +92,10 @@ export default function Header() {
 
         <FaCog
           className={headerStyles.settings}
-          onClick={() => router.push('/update/settings')}
+          onClick={() => {
+            router.push('/update/settings')
+            setIsOpen(false)
+          }}
           size="1.2rem"
         />
 

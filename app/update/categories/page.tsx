@@ -67,13 +67,6 @@ export default function Categories() {
     idExists(id) ||
     !pattern.test(id)
 
-  //Modal Scroll
-  // if (editModalOpen || addOpen) {
-  //   document.body.classList.add(modalStyles.activeModal)
-  // } else {
-  //   document.body.classList.remove(modalStyles.activeModal)
-  // }
-
   function idExists(id: string) {
     if (categories) {
       for (const category of categories) {
@@ -154,9 +147,11 @@ export default function Categories() {
       <h1>Categories</h1>
       <Label />
 
-      {categories.map((category) => (
+      {categories.map((category, i) => (
         <div className={listStyles.item}>
-          <p className={listStyles.name}>{category.englishName}</p>
+          <p className={listStyles.name}>
+            {i + 1}. {category.englishName}
+          </p>
           <FaPencilAlt onClick={() => handleEditOpen(category)} />
         </div>
       ))}
@@ -167,140 +162,148 @@ export default function Categories() {
       </AddItem>
 
       {/* Edit Modal */}
-      {editOpen ? (
-        <Modal handleClick={() => setEditOpen(false)}>
-          {editCategory ? (
+      <Modal handleClick={() => setEditOpen(false)} isOpen={editOpen}>
+        {editOpen ? (
+          <>
+            {editCategory ? (
+              <form
+                id="editCategoryForm"
+                onSubmit={(e) =>
+                  edit(
+                    e,
+                    editCategory,
+                    newId,
+                    newEnglishName,
+                    newKoreanName,
+                    store
+                  )
+                }
+                className={formStyles.form}
+              >
+                <h1>Edit Category</h1>
+                <p>ID</p>
+                <input
+                  style={
+                    editCategory?.id !== newId ? { color: 'red' } : undefined
+                  }
+                  onChange={(e) => setNewId(e.target.value.trim())}
+                  defaultValue={newId ? newId : undefined}
+                  type="text"
+                />
+                <p>English Name</p>
+                <input
+                  style={
+                    editCategory?.englishName !== newEnglishName
+                      ? { color: 'red' }
+                      : undefined
+                  }
+                  onChange={(e) => setNewEnglishName(e.target.value.trim())}
+                  defaultValue={newEnglishName ? newEnglishName : undefined}
+                  type="text"
+                />
+
+                <p>Korean Name</p>
+                <input
+                  style={
+                    editCategory?.koreanName !== newKoreanName
+                      ? { color: 'red' }
+                      : undefined
+                  }
+                  onChange={(e) => setNewKoreanName(e.target.value.trim())}
+                  defaultValue={newKoreanName ? newKoreanName : undefined}
+                  type="text"
+                />
+
+                {editCategory?.id !== newId && idExists(newId) ? (
+                  <p className={formStyles.message}>
+                    Category with id {newId} already exists!
+                  </p>
+                ) : null}
+
+                {newId.length > 0 && !pattern.test(newId) ? (
+                  <p className={formStyles.message}>
+                    id should be alphanumeric{'('}a-z, A-Z, 0-9{')'}!
+                  </p>
+                ) : null}
+              </form>
+            ) : null}
+
+            <div className={formStyles.buttons}>
+              <button onClick={() => setEditOpen(false)}>Close</button>
+
+              {editCategory ? (
+                <button onClick={() => handleDelete(editCategory, store)}>
+                  Delete
+                </button>
+              ) : null}
+
+              <button
+                type="submit"
+                form="editCategoryForm"
+                disabled={editDisabled}
+              >
+                Edit
+              </button>
+            </div>
+          </>
+        ) : null}
+      </Modal>
+
+      {/* Add Modal */}
+      <Modal handleClick={() => setAddOpen(false)} isOpen={addOpen}>
+        {addOpen ? (
+          <>
             <form
-              id="editCategoryForm"
-              onSubmit={(e) =>
-                edit(
-                  e,
-                  editCategory,
-                  newId,
-                  newEnglishName,
-                  newKoreanName,
-                  store
-                )
-              }
+              id="addCategoryForm"
+              onSubmit={(e) => add(e, store)}
               className={formStyles.form}
             >
-              <h1>Edit Category</h1>
-              <p>ID</p>
+              <h1>Add Category</h1>
+              <p>ID *</p>
               <input
-                style={
-                  editCategory?.id !== newId ? { color: 'red' } : undefined
-                }
-                onChange={(e) => setNewId(e.target.value.trim())}
-                defaultValue={newId ? newId : undefined}
+                onChange={(e) => setId(e.target.value.trim())}
                 type="text"
+                placeholder="ID"
               />
-              <p>English Name</p>
+              <p>English Name *</p>
               <input
-                style={
-                  editCategory?.englishName !== newEnglishName
-                    ? { color: 'red' }
-                    : undefined
-                }
-                onChange={(e) => setNewEnglishName(e.target.value.trim())}
-                defaultValue={newEnglishName ? newEnglishName : undefined}
+                onChange={(e) => setEnglishName(e.target.value.trim())}
                 type="text"
+                placeholder="English Name"
+              />
+              <p>Korean Name *</p>
+              <input
+                onChange={(e) => setKoreanName(e.target.value.trim())}
+                type="text"
+                placeholder="Korean Name"
               />
 
-              <p>Korean Name</p>
-              <input
-                style={
-                  editCategory?.koreanName !== newKoreanName
-                    ? { color: 'red' }
-                    : undefined
-                }
-                onChange={(e) => setNewKoreanName(e.target.value.trim())}
-                defaultValue={newKoreanName ? newKoreanName : undefined}
-                type="text"
-              />
-
-              {editCategory?.id !== newId && idExists(newId) ? (
+              {idExists(id) ? (
                 <p className={formStyles.message}>
-                  Category with id {newId} already exists!
+                  Category with id {id} already exists!
                 </p>
               ) : null}
 
-              {newId.length > 0 && !pattern.test(newId) ? (
+              {id.length > 0 && !pattern.test(id) ? (
                 <p className={formStyles.message}>
                   id should be alphanumeric{'('}a-z, A-Z, 0-9{')'}!
                 </p>
               ) : null}
             </form>
-          ) : null}
 
-          <div className={formStyles.buttons}>
-            <button onClick={() => setEditOpen(false)}>Close</button>
-
-            {editCategory ? (
-              <button onClick={() => handleDelete(editCategory, store)}>
-                Delete
+            <div className={formStyles.buttons}>
+              <button onClick={() => setAddOpen(false)}>Close</button>
+              <button
+                type="submit"
+                form="addCategoryForm"
+                disabled={addDisabled}
+              >
+                Add
               </button>
-            ) : null}
-
-            <button
-              type="submit"
-              form="editCategoryForm"
-              disabled={editDisabled}
-            >
-              Edit
-            </button>
-          </div>
-        </Modal>
-      ) : null}
-
-      {/* Add Modal */}
-      {addOpen ? (
-        <Modal handleClick={() => setAddOpen(false)}>
-          <form
-            id="addCategoryForm"
-            onSubmit={(e) => add(e, store)}
-            className={formStyles.form}
-          >
-            <h1>Add Category</h1>
-            <p>ID *</p>
-            <input
-              onChange={(e) => setId(e.target.value.trim())}
-              type="text"
-              placeholder="ID"
-            />
-            <p>English Name *</p>
-            <input
-              onChange={(e) => setEnglishName(e.target.value.trim())}
-              type="text"
-              placeholder="English Name"
-            />
-            <p>Korean Name *</p>
-            <input
-              onChange={(e) => setKoreanName(e.target.value.trim())}
-              type="text"
-              placeholder="Korean Name"
-            />
-
-            {idExists(id) ? (
-              <p className={formStyles.message}>
-                Category with id {id} already exists!
-              </p>
-            ) : null}
-
-            {id.length > 0 && !pattern.test(id) ? (
-              <p className={formStyles.message}>
-                id should be alphanumeric{'('}a-z, A-Z, 0-9{')'}!
-              </p>
-            ) : null}
-          </form>
-
-          <div className={formStyles.buttons}>
-            <button onClick={() => setAddOpen(false)}>Close</button>
-            <button type="submit" form="addCategoryForm" disabled={addDisabled}>
-              Add
-            </button>
-          </div>
-        </Modal>
-      ) : null}
+            </div>
+          </>
+        ) : null}
+      </Modal>
     </div>
   )
 }

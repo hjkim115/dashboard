@@ -197,6 +197,7 @@ export default function menu() {
   //Edit Image
   const [editImageOpen, setEditImageOpen] = useState(false)
   const [newImage, setNewImage] = useState<File | null>(null)
+  const [imageUploadLoading, setImageUploadLoading] = useState(false)
 
   function handleEditImageOpen() {
     setNewImage(null)
@@ -205,16 +206,25 @@ export default function menu() {
 
   async function handleImageEdit(
     e: React.FormEvent<HTMLFormElement>,
-    newImage: File
+    newImage: File,
+    store: string,
+    category: string,
+    id: string
   ) {
     e.preventDefault()
+
+    alert(
+      'It may take sometime for image to be updated as it still remains in the cache!'
+    )
+
+    setImageUploadLoading(true)
+    setEditImageOpen(false)
 
     const typeToExtensions: { [id: string]: string } = {
       'image/jpg': 'jpg',
       'image/jpeg': 'jpeg',
       'image/png': 'png',
     }
-    setEditImageOpen(false)
 
     //Get Presigned Upload url
     const uploadUrlRes = await fetch(
@@ -233,6 +243,12 @@ export default function menu() {
         'Content-Length': newImage?.size.toString(),
       },
     })
+
+    await updateMenu(store, id, category, {
+      imageName: `${category}-${id}.${typeToExtensions[newImage.type]}`,
+    })
+
+    setImageUploadLoading(false)
   }
 
   //Add Category
@@ -543,7 +559,8 @@ export default function menu() {
       store &&
       id &&
       category
-    )
+    ) ||
+    imageUploadLoading
   ) {
     return <LoadingPage />
   }
@@ -564,11 +581,13 @@ export default function menu() {
         >
           <p>ID*</p>
           <input
+            style={menu.id !== newId ? { color: 'red' } : undefined}
             defaultValue={newId}
             onChange={(e) => setNewId(e.target.value.trim())}
           />
           <p>Category*</p>
           <select
+            style={menu.category !== newCategory ? { color: 'red' } : undefined}
             defaultValue={newCategory}
             onChange={(e) => setNewCategory(e.target.value.trim())}
           >
@@ -578,21 +597,33 @@ export default function menu() {
           </select>
           <p>English Name*</p>
           <input
+            style={
+              menu.englishName !== newEnglishName ? { color: 'red' } : undefined
+            }
             defaultValue={newEnglishName}
             onChange={(e) => setNewEnglishName(e.target.value.trim())}
           />
           <p>Korean Name*</p>
           <input
+            style={
+              menu.koreanName !== newKoreanName ? { color: 'red' } : undefined
+            }
             defaultValue={newKoreanName}
             onChange={(e) => setNewKoreanName(e.target.value.trim())}
           />
           <p>Price*</p>
           <input
+            style={
+              menu.price.toString() !== newPrice ? { color: 'red' } : undefined
+            }
             defaultValue={newPrice}
             onChange={(e) => setNewPrice(e.target.value.trim())}
           />
           <p>Description</p>
           <textarea
+            style={
+              menu.description !== newDescription ? { color: 'red' } : undefined
+            }
             defaultValue={newDescription}
             onChange={(e) => setNewDescription(e.target.value.trim())}
             rows={3}
@@ -681,239 +712,283 @@ export default function menu() {
         </div>
       ))}
 
-      {editImageOpen ? (
-        <Modal handleClick={() => setEditImageOpen(false)}>
-          <form
-            onSubmit={(e) => handleImageEdit(e, newImage as File)}
-            id="editImageForm"
-            className={formStyles.form}
-          >
-            <h1>Edit Image</h1>
-            <div
-              style={{
-                backgroundImage: `url('${process.env.NEXT_PUBLIC_CLOUD_FRONT_URL}/${store}/${menu.imageName}')`,
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                backgroundSize: 'contain',
-                width: '100%',
-                height: '30vh',
-                margin: '0.5rem',
-              }}
-            />
-            <p>Image*</p>
-            <input
-              onChange={(e) => {
-                if (e.target.files) {
-                  setNewImage(e.target.files[0])
+      <Modal handleClick={() => setEditImageOpen(false)} isOpen={editImageOpen}>
+        {editImageOpen ? (
+          <>
+            <form
+              onSubmit={(e) =>
+                handleImageEdit(e, newImage as File, store, category, id)
+              }
+              id="editImageForm"
+              className={formStyles.form}
+            >
+              <h1>Edit Image</h1>
+              <div
+                style={{
+                  backgroundImage: `url('${process.env.NEXT_PUBLIC_CLOUD_FRONT_URL}/${store}/${menu.imageName}')`,
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: 'contain',
+                  width: '100%',
+                  height: '30vh',
+                  margin: '0.5rem',
+                }}
+              />
+              <p>Image*</p>
+              <input
+                onChange={(e) => {
+                  if (e.target.files) {
+                    setNewImage(e.target.files[0])
+                  }
+                }}
+                type="file"
+                accept=".jpg, .jpeg, .png"
+              />
+            </form>
+            <div className={formStyles.buttons}>
+              <button onClick={() => setEditImageOpen(false)}>Close</button>
+              <button type="submit" form="editImageForm" disabled={!newImage}>
+                Edit
+              </button>
+            </div>{' '}
+          </>
+        ) : null}
+      </Modal>
+
+      <Modal
+        handleClick={() => setAddCategoryOpen(false)}
+        isOpen={addCategoryOpen}
+      >
+        {addCategoryOpen ? (
+          <>
+            <form
+              onSubmit={(e) => addOptionCategory(e)}
+              id="addOptionCategory"
+              className={formStyles.form}
+            >
+              <h1>Add Category</h1>
+              <p>Category*</p>
+              <input
+                onChange={(e) => setaddCategory(e.target.value.trim())}
+                type="text"
+                placeholder="Category"
+              />
+
+              {Object.keys(options).includes(addCategory) ? (
+                <p className={formStyles.message}>
+                  Category {addCategory} already exists!
+                </p>
+              ) : null}
+            </form>
+            <div className={formStyles.buttons}>
+              <button onClick={() => handleAddCategoryClose()}>Close</button>
+              <button
+                type="submit"
+                form="addOptionCategory"
+                disabled={addOptionCategoryDisabled}
+              >
+                Add
+              </button>
+            </div>
+          </>
+        ) : null}
+      </Modal>
+
+      <Modal
+        handleClick={() => setEditCategoryOpen(false)}
+        isOpen={editCategoryOpen}
+      >
+        {editCategoryOpen ? (
+          <>
+            <form
+              onSubmit={(e) =>
+                handleEditOptionCategory(e, options, store, category, id)
+              }
+              id="editOptionCategory"
+              className={formStyles.form}
+            >
+              <h1>Edit Category</h1>
+              <p>Category*</p>
+              <input
+                style={
+                  editCategory !== newOptionCategory
+                    ? { color: 'red' }
+                    : undefined
                 }
-              }}
-              type="file"
-              accept=".jpg, .jpeg, .png"
-            />
-          </form>
-          <div className={formStyles.buttons}>
-            <button onClick={() => setEditImageOpen(false)}>Close</button>
-            <button type="submit" form="editImageForm" disabled={!newImage}>
-              Edit
-            </button>
-          </div>
-        </Modal>
-      ) : null}
+                onChange={(e) => setNewOptionCategory(e.target.value.trim())}
+                defaultValue={newOptionCategory}
+                type="text"
+              />
 
-      {addCategoryOpen ? (
-        <Modal handleClick={() => setAddCategoryOpen(false)}>
-          <form
-            onSubmit={(e) => addOptionCategory(e)}
-            id="addOptionCategory"
-            className={formStyles.form}
-          >
-            <h1>Add Category</h1>
-            <p>Category*</p>
-            <input
-              onChange={(e) => setaddCategory(e.target.value.trim())}
-              type="text"
-              placeholder="Category"
-            />
+              {editCategory !== newOptionCategory &&
+              Object.keys(options).includes(newOptionCategory) ? (
+                <p className={formStyles.message}>
+                  Category {newOptionCategory} already exists!
+                </p>
+              ) : null}
+            </form>
+            <div className={formStyles.buttons}>
+              <button onClick={() => setEditCategoryOpen(false)}>Close</button>
+              <button
+                onClick={() =>
+                  handleDeleteOptionCategory(options, store, category, id)
+                }
+              >
+                Delete
+              </button>
+              <button
+                type="submit"
+                form="editOptionCategory"
+                disabled={editCategoryDisabled}
+              >
+                Edit
+              </button>
+            </div>
+          </>
+        ) : null}
+      </Modal>
 
-            {Object.keys(options).includes(addCategory) ? (
-              <p className={formStyles.message}>
-                Category {addCategory} already exists!
-              </p>
-            ) : null}
-          </form>
-          <div className={formStyles.buttons}>
-            <button onClick={() => handleAddCategoryClose()}>Close</button>
-            <button
-              type="submit"
-              form="addOptionCategory"
-              disabled={addOptionCategoryDisabled}
+      <Modal handleClick={() => setAddOptionOpen(false)} isOpen={addOptionOpen}>
+        {addOptionOpen ? (
+          <>
+            <form
+              id="addOptionForm"
+              onSubmit={(e) => addOption(e, store, id as string, category)}
+              className={formStyles.form}
             >
-              Add
-            </button>
-          </div>
-        </Modal>
-      ) : null}
+              <h1>Add {optionCategory}</h1>
+              <p>ID*</p>
+              <input
+                placeholder="ID"
+                onChange={(e) => setOptionId(e.target.value.trim())}
+              />
+              <p>English Name*</p>
+              <input
+                placeholder="English Name"
+                onChange={(e) => setEnglishName(e.target.value.trim())}
+              />
+              <p>Korean Name*</p>
+              <input
+                placeholder="Korean Name"
+                onChange={(e) => setKoreanName(e.target.value.trim())}
+              />
+              <p>Price*</p>
+              <input
+                placeholder="Price"
+                onChange={(e) => setPrice(e.target.value.trim())}
+              />
+              {optionExists(options, optionCategory, optionId) ? (
+                <p className={formStyles.message}>
+                  Option with category {optionCategory}, id {optionId} already
+                  exists!
+                </p>
+              ) : null}
 
-      {editCategoryOpen ? (
-        <Modal handleClick={() => setEditCategoryOpen(false)}>
-          <form
-            onSubmit={(e) =>
-              handleEditOptionCategory(e, options, store, category, id)
-            }
-            id="editOptionCategory"
-            className={formStyles.form}
-          >
-            <h1>Edit Category</h1>
-            <p>Category*</p>
-            <input
-              onChange={(e) => setNewOptionCategory(e.target.value.trim())}
-              defaultValue={newOptionCategory}
-              type="text"
-            />
+              {price.length > 0 && !isPriceValid(price) ? (
+                <p className={formStyles.message}>
+                  Price should be a number with a maximum of 2 decimal places!
+                </p>
+              ) : null}
+            </form>
+            <div className={formStyles.buttons}>
+              <button onClick={() => setAddOptionOpen(false)}>Close</button>
+              <button
+                type="submit"
+                form="addOptionForm"
+                disabled={addOptionDisabled}
+              >
+                Add
+              </button>
+            </div>{' '}
+          </>
+        ) : null}
+      </Modal>
 
-            {editCategory !== newOptionCategory &&
-            Object.keys(options).includes(newOptionCategory) ? (
-              <p className={formStyles.message}>
-                Category {newOptionCategory} already exists!
-              </p>
-            ) : null}
-          </form>
-          <div className={formStyles.buttons}>
-            <button onClick={() => setEditCategoryOpen(false)}>Close</button>
-            <button
-              onClick={() =>
-                handleDeleteOptionCategory(options, store, category, id)
+      <Modal
+        handleClick={() => setEditOptionOpen(false)}
+        isOpen={editOptionOpen}
+      >
+        {editOptionOpen ? (
+          <>
+            <form
+              onSubmit={(e) =>
+                handleOptionEdit(e, store, editOption as Option, category, id)
               }
+              id="editOptionForm"
+              className={formStyles.form}
             >
-              Delete
-            </button>
-            <button
-              type="submit"
-              form="editOptionCategory"
-              disabled={editCategoryDisabled}
-            >
-              Edit
-            </button>
-          </div>
-        </Modal>
-      ) : null}
+              <h1>Edit Option</h1>
+              <p>ID*</p>
+              <input
+                style={
+                  editOption.id !== newOptionId ? { color: 'red' } : undefined
+                }
+                defaultValue={newOptionId}
+                onChange={(e) => setNewOptionId(e.target.value.trim())}
+              />
+              <p>English Name*</p>
+              <input
+                style={
+                  editOption.englishName !== newOptionEnglishName
+                    ? { color: 'red' }
+                    : undefined
+                }
+                defaultValue={newOptionEnglishName}
+                onChange={(e) => setNewOptionEnglishName(e.target.value.trim())}
+              />
+              <p>Korean Name*</p>
+              <input
+                style={
+                  editOption.koreanName !== newOptionKoreanName
+                    ? { color: 'red' }
+                    : undefined
+                }
+                defaultValue={newOptionKoreanName}
+                onChange={(e) => setNewOptionKoreanName(e.target.value.trim())}
+              />
+              <p>Price*</p>
+              <input
+                style={
+                  editOption.price.toString() !== newOptionPrice
+                    ? { color: 'red' }
+                    : undefined
+                }
+                defaultValue={newOptionPrice}
+                onChange={(e) => setNewOptionPrice(e.target.value.trim())}
+              />
+              {newOptionPrice.length > 0 && !isPriceValid(newOptionPrice) ? (
+                <p className={formStyles.message}>
+                  Price should be a number with a maximum of 2 decimal places!
+                </p>
+              ) : null}
 
-      {addOptionOpen ? (
-        <Modal handleClick={() => setAddOptionOpen(false)}>
-          <form
-            id="addOptionForm"
-            onSubmit={(e) => addOption(e, store, id as string, category)}
-            className={formStyles.form}
-          >
-            <h1>Add {optionCategory}</h1>
-            <p>ID*</p>
-            <input
-              placeholder="ID"
-              onChange={(e) => setOptionId(e.target.value.trim())}
-            />
-            <p>English Name*</p>
-            <input
-              placeholder="English Name"
-              onChange={(e) => setEnglishName(e.target.value.trim())}
-            />
-            <p>Korean Name*</p>
-            <input
-              placeholder="Korean Name"
-              onChange={(e) => setKoreanName(e.target.value.trim())}
-            />
-            <p>Price*</p>
-            <input
-              placeholder="Price"
-              onChange={(e) => setPrice(e.target.value.trim())}
-            />
-            {optionExists(options, optionCategory, optionId) ? (
-              <p className={formStyles.message}>
-                Option with category {optionCategory}, id {optionId} already
-                exists!
-              </p>
-            ) : null}
-
-            {price.length > 0 && !isPriceValid(price) ? (
-              <p className={formStyles.message}>
-                Price should be a number with a maximum of 2 decimal places!
-              </p>
-            ) : null}
-          </form>
-          <div className={formStyles.buttons}>
-            <button onClick={() => setAddOptionOpen(false)}>Close</button>
-            <button
-              type="submit"
-              form="addOptionForm"
-              disabled={addOptionDisabled}
-            >
-              Add
-            </button>
-          </div>
-        </Modal>
-      ) : null}
-
-      {editOptionOpen ? (
-        <Modal handleClick={() => setEditOptionOpen(false)}>
-          <form
-            onSubmit={(e) =>
-              handleOptionEdit(e, store, editOption as Option, category, id)
-            }
-            id="editOptionForm"
-            className={formStyles.form}
-          >
-            <h1>Edit Option</h1>
-            <p>ID*</p>
-            <input
-              defaultValue={newOptionId}
-              onChange={(e) => setNewOptionId(e.target.value.trim())}
-            />
-            <p>English Name*</p>
-            <input
-              defaultValue={newOptionEnglishName}
-              onChange={(e) => setNewOptionEnglishName(e.target.value.trim())}
-            />
-            <p>Korean Name*</p>
-            <input
-              defaultValue={newOptionKoreanName}
-              onChange={(e) => setNewOptionKoreanName(e.target.value.trim())}
-            />
-            <p>Price*</p>
-            <input
-              defaultValue={newOptionPrice}
-              onChange={(e) => setNewOptionPrice(e.target.value.trim())}
-            />
-            {newOptionPrice.length > 0 && !isPriceValid(newOptionPrice) ? (
-              <p className={formStyles.message}>
-                Price should be a number with a maximum of 2 decimal places!
-              </p>
-            ) : null}
-
-            {editOption.id !== newOptionId &&
-            optionExists(options, editOption.category, newOptionId) ? (
-              <p className={formStyles.message}>
-                {editOption.category} with id {newOptionId} already exists!
-              </p>
-            ) : null}
-          </form>
-          <div className={formStyles.buttons}>
-            <button onClick={() => setEditOptionOpen(false)}>Close</button>
-            <button
-              onClick={() =>
-                handleOptionDelete(store, category, id, editOption as Option)
-              }
-            >
-              Delete
-            </button>
-            <button
-              type="submit"
-              form="editOptionForm"
-              disabled={editOptionDisabled}
-            >
-              Edit
-            </button>
-          </div>
-        </Modal>
-      ) : null}
+              {editOption.id !== newOptionId &&
+              optionExists(options, editOption.category, newOptionId) ? (
+                <p className={formStyles.message}>
+                  {editOption.category} with id {newOptionId} already exists!
+                </p>
+              ) : null}
+            </form>
+            <div className={formStyles.buttons}>
+              <button onClick={() => setEditOptionOpen(false)}>Close</button>
+              <button
+                onClick={() =>
+                  handleOptionDelete(store, category, id, editOption as Option)
+                }
+              >
+                Delete
+              </button>
+              <button
+                type="submit"
+                form="editOptionForm"
+                disabled={editOptionDisabled}
+              >
+                Edit
+              </button>
+            </div>
+          </>
+        ) : null}
+      </Modal>
     </div>
   )
 }
