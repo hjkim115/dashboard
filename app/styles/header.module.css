@@ -20,26 +20,26 @@
 }
 
 .home {
-  margin-right: 1rem;
   color: white;
 }
 
 .settings {
-  margin-right: 1rem;
+  margin-left: 1rem;
   color: white;
 }
 
 .logOut {
-  margin-right: 1rem;
+  margin-left: 1rem;
   color: white;
 }
 
 .navbarToggle {
+  margin-left: 1rem;
   color: white;
 }
 
-body.activeModal {
-  overflow-y: hidden;
+.noScroll {
+  overflow: hidden;
 }
 
 .navbar {
@@ -182,7 +182,7 @@ body.activeModal {
   }
 
   .home {
-    margin-right: 0;
+    margin-left: 0;
   }
 
   .home:hover {
@@ -190,7 +190,7 @@ body.activeModal {
   }
 
   .settings {
-    margin-right: 0;
+    margin-left: 0;
   }
 
   .settings:hover {
@@ -198,7 +198,7 @@ body.activeModal {
   }
 
   .logOut {
-    margin-right: 0;
+    margin-left: 0;
   }
 
   .logOut:hover {

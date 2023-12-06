@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import headerStyles from '../styles/header.module.css'
 import { useRouter, usePathname } from 'next/navigation'
 import { FaBars, FaTimes, FaPowerOff, FaHome, FaCog } from 'react-icons/fa'
@@ -27,11 +27,13 @@ export default function Header() {
     Tables: '/update/tables',
   }
 
-  // if (isOpen) {
-  //   document.body.classList.add(headerStyles.activeModal)
-  // } else {
-  //   document.body.classList.remove(headerStyles.activeModal)
-  // }
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add(headerStyles.noScroll)
+    } else {
+      document.body.classList.remove(headerStyles.noScroll)
+    }
+  }, [isOpen])
 
   async function handleLogOut() {
     if (confirm('Are you sure you want to log out?')) {
@@ -109,19 +111,23 @@ export default function Header() {
         />
 
         {/* Menu Icon */}
-        {isOpen ? (
-          <FaTimes
-            className={headerStyles.navbarToggle}
-            onClick={() => setIsOpen(!isOpen)}
-            size="1.2rem"
-          />
-        ) : (
-          <FaBars
-            className={headerStyles.navbarToggle}
-            onClick={() => setIsOpen(!isOpen)}
-            size="1.2rem"
-          />
-        )}
+        {pathName !== '/update/editMenu' ? (
+          <>
+            {isOpen ? (
+              <FaTimes
+                className={headerStyles.navbarToggle}
+                onClick={() => setIsOpen(!isOpen)}
+                size="1.2rem"
+              />
+            ) : (
+              <FaBars
+                className={headerStyles.navbarToggle}
+                onClick={() => setIsOpen(!isOpen)}
+                size="1.2rem"
+              />
+            )}
+          </>
+        ) : null}
       </div>
 
       <div

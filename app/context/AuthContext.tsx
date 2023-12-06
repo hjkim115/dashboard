@@ -22,7 +22,6 @@ export const AuthContext = createContext({} as AuthContextType)
 
 export function AuthContextProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>()
-  console.log(user)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {

@@ -20,9 +20,16 @@ import {
 } from '@/app/utils/firebase'
 import { useSearchParams, useRouter } from 'next/navigation'
 import LoadingPage from '@/app/components/LoadingPage'
-import { FaPlus, FaAngleDown, FaAngleUp, FaPencilAlt } from 'react-icons/fa'
+import {
+  FaPlus,
+  FaAngleDown,
+  FaAngleUp,
+  FaPencilAlt,
+  FaArrowLeft,
+} from 'react-icons/fa'
 import Modal from '@/app/components/Modal'
 import { server } from '@/app/utils/config'
+import Link from 'next/link'
 
 export default function menu() {
   const [menus, setMenus] = useState<Menu[] | null>(null)
