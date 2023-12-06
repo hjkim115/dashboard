@@ -8,7 +8,8 @@ module.exports = {
           { key: 'Access-Control-Allow-Credentials', value: 'true' },
           {
             key: 'Access-Control-Allow-Origin',
-            value: process.env.ACCESS_CONTROL_ALLOW_ORIGIN,
+            value: '*',
+            // value: process.env.ACCESS_CONTROL_ALLOW_ORIGIN,
           },
           {
             key: 'Access-Control-Allow-Methods',
