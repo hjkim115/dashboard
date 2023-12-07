@@ -6,18 +6,18 @@ export async function GET(request: any) {
   const fileName = searchParams.get('fileName')
 
   if (!store) {
-    return Response.json({ message: 'Store is not set!' })
+    return Response.json({ message: 'Store is not set!' }, { status: 400 })
   }
   if (!fileName) {
-    return Response.json({ message: 'File name is not set!' })
+    return Response.json({ message: 'File name is not set!' }, { status: 400 })
   }
 
   try {
     const uploadUrl = await getUploadUrl(store, fileName)
-    return Response.json(uploadUrl)
+    return Response.json(uploadUrl, { status: 200 })
   } catch (error) {
     if (error instanceof Error) {
-      return Response.json({ message: error.message })
+      return Response.json({ message: error.message }, { status: 500 })
     }
   }
 }
