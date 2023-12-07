@@ -719,6 +719,10 @@ export default function menu() {
         </div>
       ))}
 
+      <Link className={detailsStyles.goBack} href="/update/menus">
+        <FaArrowLeft /> GoBack
+      </Link>
+
       <Modal handleClick={() => setEditImageOpen(false)} isOpen={editImageOpen}>
         {editImageOpen ? (
           <>

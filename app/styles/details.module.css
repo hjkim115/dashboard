@@ -103,6 +103,21 @@
   justify-content: space-between;
 }
 
+.goBack {
+  padding: 0.7rem;
+  display: flex;
+  align-items: center;
+  color: white;
+  background-color: green;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  position: fixed;
+  position: fixed;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  font-size: medium;
+}
+
 @media (min-width: 700px) {
   .detailsContainer {
     margin-left: 12rem;
