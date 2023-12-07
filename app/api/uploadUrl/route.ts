@@ -21,3 +21,7 @@ export async function GET(request: any) {
     }
   }
 }
+
+export async function OPTIONS() {
+  return Response.json({ status: 200 })
+}
