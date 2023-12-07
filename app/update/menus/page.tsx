@@ -199,44 +199,44 @@ export default function Menus() {
     const helloRes = await fetch(`${server}/api/test`)
     console.log(await helloRes.text())
 
-    //Get Presigned Upload url
-    const uploadUrlRes = await fetch(
-      `${server}/api/uploadUrl?fileName=${category}-${id}.${
-        typeToExtensions[image.type]
-      }&store=${store}`
-    )
-    const uploadUrl = await uploadUrlRes.json()
+    // //Get Presigned Upload url
+    // const uploadUrlRes = await fetch(
+    //   `${server}/api/uploadUrl?fileName=${category}-${id}.${
+    //     typeToExtensions[image.type]
+    //   }&store=${store}`
+    // )
+    // const uploadUrl = await uploadUrlRes.json()
 
-    //Upload Image
-    await fetch(uploadUrl, {
-      method: 'PUT',
-      body: image,
-      headers: {
-        'Content-Type': image?.type,
-        'Content-Length': image?.size.toString(),
-      },
-    })
+    // //Upload Image
+    // await fetch(uploadUrl, {
+    //   method: 'PUT',
+    //   body: image,
+    //   headers: {
+    //     'Content-Type': image?.type,
+    //     'Content-Length': image?.size.toString(),
+    //   },
+    // })
 
-    //Add Menu
-    const menu: Menu = {
-      id: id,
-      category: category,
-      koreanName: koreanName,
-      englishName: englishName,
-      price: Number(price),
-      imageName: `${category}-${id}.${typeToExtensions[image.type]}`,
-    }
+    // //Add Menu
+    // const menu: Menu = {
+    //   id: id,
+    //   category: category,
+    //   koreanName: koreanName,
+    //   englishName: englishName,
+    //   price: Number(price),
+    //   imageName: `${category}-${id}.${typeToExtensions[image.type]}`,
+    // }
 
-    if (description !== '') {
-      menu.description = description
-    }
+    // if (description !== '') {
+    //   menu.description = description
+    // }
 
-    await postMenu(store, menu)
+    // await postMenu(store, menu)
 
-    const newMenus = await getAllMenus(store)
-    setMenus(newMenus)
+    // const newMenus = await getAllMenus(store)
+    // setMenus(newMenus)
 
-    setImageUploadLoading(false)
+    // setImageUploadLoading(false)
   }
 
   if (!(categories && menus && store) || imageUploadLoading) {
