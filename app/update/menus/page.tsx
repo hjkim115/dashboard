@@ -196,6 +196,9 @@ export default function Menus() {
       'image/png': 'png',
     }
 
+    const helloRes = await fetch(`${server}/api/test`)
+    console.log(await helloRes.text())
+
     //Get Presigned Upload url
     const uploadUrlRes = await fetch(
       `${server}/api/uploadUrl?fileName=${category}-${id}.${
