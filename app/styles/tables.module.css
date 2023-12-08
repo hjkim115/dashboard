@@ -11,7 +11,7 @@
   font-size: 2rem;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 800px) {
   .tablesContainer {
     margin-left: 12rem;
     padding-top: 0;

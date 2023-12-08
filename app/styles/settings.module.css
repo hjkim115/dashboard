@@ -52,7 +52,7 @@
   background-color: gray;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 800px) {
   .settingsContainer {
     margin-left: 12rem;
     padding-top: 0;

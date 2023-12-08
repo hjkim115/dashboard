@@ -32,7 +32,7 @@
   animation: spinner 1s linear infinite;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 800px) {
   .loadingPageContainer {
     margin-left: 12rem;
   }

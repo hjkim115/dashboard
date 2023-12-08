@@ -26,7 +26,7 @@
   padding: 0.5rem;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 800px) {
   .menusContainer {
     margin-left: 12rem;
     padding-top: 0;

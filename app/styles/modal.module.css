@@ -37,7 +37,7 @@
   overflow: hidden;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 800px) {
   .content {
     width: 70%;
     height: 80%;

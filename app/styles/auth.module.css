@@ -52,7 +52,7 @@
   font-size: large;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 800px) {
   .form {
     width: 60%;
   }

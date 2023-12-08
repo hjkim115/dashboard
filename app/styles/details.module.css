@@ -118,7 +118,7 @@
   font-size: medium;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 800px) {
   .detailsContainer {
     margin-left: 12rem;
     padding-top: 0;
