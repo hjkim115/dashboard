@@ -52,10 +52,3 @@
 .update button:disabled {
   background-color: gray;
 }
-
-@media (min-width: 800px) {
-  .settingsContainer {
-    margin-left: 12rem;
-    padding-top: 0;
-  }
-}
