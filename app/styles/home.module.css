@@ -59,13 +59,6 @@
   box-shadow: 0px -2px 10px;
 }
 
-@media (orientation: landscape) {
-  .buttons {
-    grid-template-columns: repeat(3, 30%);
-    grid-auto-rows: minmax(25vw, auto);
-  }
-}
-
 @media (min-width: 800px) {
   .homeContainer {
     margin-left: 12rem;

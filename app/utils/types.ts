@@ -54,3 +54,8 @@ export type OrderDetail = {
   price: number
   amount: number
 }
+
+export type Settings = {
+  name: string
+  logoImageName: string
+}

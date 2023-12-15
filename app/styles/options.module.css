@@ -1,0 +1,53 @@
+.title {
+  width: 80%;
+  text-align: start;
+  padding: 0.5rem;
+}
+
+.categoriesLabel {
+  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  background-color: gray;
+  color: black;
+  box-shadow: 1px 1px 5px black;
+  border-radius: 0.5rem;
+  margin: 0.07rem;
+}
+
+.optionsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 80%;
+}
+
+.categoryLabel {
+  width: 95%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  background-color: lightgray;
+  color: black;
+  box-shadow: 1px 1px 5px black;
+  border-radius: 0.5rem;
+  margin: 0.07rem;
+}
+
+.editCategory {
+  margin-right: 0.5rem;
+}
+
+.addOption {
+  margin-right: 0.5rem;
+}
+
+.option {
+  display: flex;
+  width: 90%;
+  padding: 0.5rem;
+  justify-content: space-between;
+}

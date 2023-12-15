@@ -14,8 +14,9 @@ import {
   deleteDoc,
   setDoc,
   writeBatch,
+  runTransaction,
 } from 'firebase/firestore'
-import { Category, Menu, Table, Option, Options } from './types'
+import { Category, Menu, Table, Option, Options, Settings } from './types'
 import { getAuth } from 'firebase/auth'
 
 //Firebase Setup
@@ -95,19 +96,19 @@ export async function deleteCategory(store: string, id: string) {
   await deleteDoc(categoryRef)
 }
 
-//Company Name Get
-export async function getCompanyName(store: string) {
+//Settings Get
+export async function getSettings(store: string) {
   const settingsRef = doc(db, 'settings', store)
   const snapshot = await getDoc(settingsRef)
-  const companyName = snapshot.data()?.name as string
+  const settings = snapshot.data() as Settings
 
-  return companyName
+  return settings
 }
 
-//Company Name Put
-export async function updateCompanyName(store: string, companyName: string) {
+//Settings Put
+export async function updateSettings(store: string, newSettings: Settings) {
   const settingsRef = doc(db, 'settings', store)
-  await setDoc(settingsRef, { name: companyName })
+  await updateDoc(settingsRef, newSettings)
 }
 
 //Tables Get All
@@ -210,7 +211,7 @@ export async function updateMenu(
   store: string,
   id: string,
   category: string,
-  values: any
+  newMenu: Menu
 ) {
   const menusRef = collection(doc(db, 'menus', store), 'menus')
   const menusQuery = query(
@@ -225,9 +226,9 @@ export async function updateMenu(
     menuRefIds.push(document.id)
   })
 
-  updateDoc(doc(doc(db, 'menus', store), 'menus', menuRefIds[0]), values)
+  updateDoc(doc(doc(db, 'menus', store), 'menus', menuRefIds[0]), newMenu)
 
-  if (values.id || values.category) {
+  if (newMenu.id || newMenu.category) {
     const optionsRef = collection(doc(db, 'options', store), 'options')
     const optionsQuery = query(
       optionsRef,
@@ -244,8 +245,8 @@ export async function updateMenu(
     const batch = writeBatch(db)
     for (let optionRefId of optionRefIds) {
       batch.update(doc(doc(db, 'options', store), 'options', optionRefId), {
-        menuId: values.id,
-        menuCategory: values.category,
+        menuId: newMenu.id,
+        menuCategory: newMenu.category,
       })
     }
     await batch.commit()

@@ -3,3 +3,55 @@
   margin: 0;
   padding: 0;
 }
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2.95rem;
+  padding-bottom: 3.6rem;
+}
+
+.container h1 {
+  padding: 0.5rem;
+  font-size: 2rem;
+}
+
+.addButton {
+  position: fixed;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  background-color: green;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.7rem;
+  border-style: none;
+  font-size: medium;
+  display: flex;
+  align-items: center;
+}
+
+.goBackButton {
+  position: fixed;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  background-color: green;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.7rem;
+  border-style: none;
+  font-size: medium;
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 800px) {
+  .container {
+    margin-left: 12rem;
+    padding-top: 0;
+  }
+
+  .goBackButton {
+    left: 12.5rem;
+  }
+}

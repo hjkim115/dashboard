@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import modalStyles from '../styles/modal.module.css'
+import modalStyles from './styles/modal.module.css'
 
 type ModalProps = {
   children: React.ReactNode

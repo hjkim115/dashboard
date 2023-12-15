@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useContext } from 'react'
-import authStyles from '../styles/auth.module.css'
+import authStyles from './styles/auth.module.css'
 import { AuthContext } from '../context/AuthContext'
 
 export default function LogIn() {

@@ -2,17 +2,12 @@
 
 import { useState, useEffect, useContext } from 'react'
 import homeStyles from './styles/home.module.css'
-import {
-  getAllCategories,
-  getAllMenus,
-  getAllTables,
-  getCompanyName,
-} from './utils/firebase'
+import { getAllCategories, getAllMenus, getAllTables } from './utils/firebase'
 import { useRouter } from 'next/navigation'
 import LoadingPage from './components/LoadingPage'
 import { AuthContext } from './context/AuthContext'
 import LogIn from './components/LogIn'
-import { CompanyNameContext } from './context/CompanyNameContext'
+import { SettingsContext } from './context/SettingsContext'
 
 export default function Home() {
   const [counts, setCounts] = useState<number[] | null>(null)
@@ -22,7 +17,8 @@ export default function Home() {
   const { user } = useContext(AuthContext)
   const store = user?.displayName
 
-  const { companyName } = useContext(CompanyNameContext)
+  const { settings } = useContext(SettingsContext)
+  const companyName = settings?.name
 
   useEffect(() => {
     async function fetchCounts(store: string) {
@@ -59,7 +55,7 @@ export default function Home() {
   }
 
   return (
-    <div className={homeStyles.homeContainer}>
+    <div className={`container ${homeStyles.homeContainer}`}>
       <h1>
         Welcome <span className={homeStyles.companyName}>{companyName}!</span>
       </h1>
@@ -76,7 +72,7 @@ export default function Home() {
       ))}
 
       <div className={homeStyles.footer}>
-        <p>Powered by BS2</p>
+        <p>Developed by hjkim</p>
       </div>
     </div>
   )

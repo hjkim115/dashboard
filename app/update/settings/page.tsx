@@ -1,62 +1,98 @@
 'use client'
 
-import settingsStyles from '../../styles/settings.module.css'
+import formStyles from '../../styles/form.module.css'
 import { useState, useEffect, useContext } from 'react'
-import { getCompanyName, updateCompanyName } from '../../utils/firebase'
+import { getSettings, updateSettings } from '../../utils/firebase'
 import LoadingPage from '../../components/LoadingPage'
 import { AuthContext } from '@/app/context/AuthContext'
-import { CompanyNameContext } from '@/app/context/CompanyNameContext'
+import { SettingsContext } from '@/app/context/SettingsContext'
+import Modal from '@/app/components/Modal'
+import EditImageForm from '@/app/components/modalForms/EditImageForm'
+import { Settings } from '@/app/utils/types'
+import { useRouter } from 'next/navigation'
+import { FaArrowLeft } from 'react-icons/fa'
 
 export default function Settings() {
-  const [newCompanyName, setNewCompanyName] = useState<string | null>(null)
+  const [newCompanyName, setNewCompanyName] = useState('')
 
   const { user } = useContext(AuthContext)
   const store = user?.displayName
 
-  const { companyName, setCompanyName } = useContext(CompanyNameContext)
+  const router = useRouter()
 
-  let isDisabled
-  if (newCompanyName != null) {
-    isDisabled = companyName === newCompanyName || newCompanyName?.length <= 0
-  }
+  const { settings, setSettings } = useContext(SettingsContext)
+  const companyName = settings?.name
 
   useEffect(() => {
     if (companyName) {
       setNewCompanyName(companyName)
     }
-  }, [companyName])
+  }, [settings])
 
-  async function update(store: string, newCompanyName: string) {
-    await updateCompanyName(store, newCompanyName)
-    setCompanyName(await getCompanyName(store))
+  const disabled = !newCompanyName || companyName === newCompanyName
+
+  async function handleEdit(
+    e: React.FormEvent<HTMLFormElement>,
+    store: string,
+    settings: Settings
+  ) {
+    e.preventDefault()
+
+    const newSettings = { ...settings }
+    newSettings.name = newCompanyName
+    await updateSettings(store, newSettings)
+    setSettings(await getSettings(store))
   }
 
-  if (!store || companyName == null || newCompanyName == null) {
+  //Modal, Edit Image
+  const [editLogoOpen, setEditLogoOpen] = useState(false)
+
+  if (!(store && settings)) {
     return <LoadingPage />
   }
 
   return (
-    <div className={settingsStyles.settingsContainer}>
+    <div className={formStyles.formContainer}>
       <h1>Settings</h1>
 
-      <div className={settingsStyles.form}>
+      {/* Form */}
+      <form
+        onSubmit={(e) => handleEdit(e, store, settings)}
+        id="editCompanyNameForm"
+        className={formStyles.form}
+      >
         <p>Company Name</p>
         <input
           onChange={(e) => setNewCompanyName(e.target.value.trim())}
           defaultValue={newCompanyName}
           type="text"
-          style={!isDisabled ? { color: 'red' } : undefined}
+          style={companyName !== newCompanyName ? { color: 'red' } : undefined}
         />
-      </div>
+      </form>
 
-      <div className={settingsStyles.update}>
-        <button
-          disabled={isDisabled}
-          onClick={() => update(store, newCompanyName)}
-        >
-          Update
+      {/* Buttons */}
+      <div className={formStyles.buttons}>
+        <button onClick={() => setEditLogoOpen(true)}>Edit Image</button>
+        <button type="submit" form="editCompanyNameForm" disabled={disabled}>
+          Edit
         </button>
       </div>
+
+      {/* Go Back */}
+      <button className="goBackButton" onClick={() => router.back()}>
+        <FaArrowLeft /> Go Back
+      </button>
+
+      {/* Modals, Edit Logo Image */}
+      <Modal handleClick={() => setEditLogoOpen(false)} isOpen={editLogoOpen}>
+        <EditImageForm
+          store={store}
+          setOpen={setEditLogoOpen}
+          type="settings"
+          settings={settings}
+          setSettings={setSettings}
+        />
+      </Modal>
     </div>
   )
 }

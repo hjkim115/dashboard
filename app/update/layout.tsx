@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext'
 import LoadingPage from '../components/LoadingPage'
 import LogIn from '../components/LogIn'
 
-export default function QrOrderLayout({
+export default function updateLayout({
   children,
 }: {
   children: React.ReactNode
@@ -13,7 +13,7 @@ export default function QrOrderLayout({
   const { user } = useContext(AuthContext)
 
   return (
-    <section>
+    <section className="container">
       {user ? <>{children}</> : user === null ? <LogIn /> : <LoadingPage />}
     </section>
   )

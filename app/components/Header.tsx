@@ -2,19 +2,21 @@
 
 import Link from 'next/link'
 import { useState, useContext, useEffect } from 'react'
-import headerStyles from '../styles/header.module.css'
+import headerStyles from './styles/header.module.css'
 import { useRouter, usePathname } from 'next/navigation'
 import { FaBars, FaTimes, FaPowerOff, FaHome, FaCog } from 'react-icons/fa'
 import Loading from './Loading'
 import { AuthContext } from '../context/AuthContext'
-import { CompanyNameContext } from '../context/CompanyNameContext'
+import { SettingsContext } from '../context/SettingsContext'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const { user, logOut } = useContext(AuthContext)
   const store = user?.displayName
 
-  const { companyName } = useContext(CompanyNameContext)
+  const { settings } = useContext(SettingsContext)
+  const companyName = settings?.name
+  const logoImageName = settings?.logoImageName
 
   const router = useRouter()
   const pathName = usePathname()
@@ -52,7 +54,7 @@ export default function Header() {
       <div className={headerStyles.logoImage}>
         <div
           style={{
-            backgroundImage: `url('${process.env.NEXT_PUBLIC_CLOUD_FRONT_URL}/${store}/logo.png')`,
+            backgroundImage: `url('${process.env.NEXT_PUBLIC_CLOUD_FRONT_URL}/${store}/${logoImageName}')`,
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
