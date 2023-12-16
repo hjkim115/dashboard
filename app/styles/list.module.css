@@ -7,11 +7,6 @@
   padding-bottom: 3.6rem;
 }
 
-.listContainer h1 {
-  padding: 0.5rem;
-  font-size: 2rem;
-}
-
 /* Label */
 .label {
   display: flex;

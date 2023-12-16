@@ -72,9 +72,7 @@ export default function Menus() {
   }
 
   return (
-    <div
-      className={`${listStyles.listContainer} ${menusStyles.menusContainer}`}
-    >
+    <div className={menusStyles.menusContainer}>
       {/* Filter */}
       <div className={menusStyles.filter}>
         <select onChange={(e) => changeCategory(e.target.value)}>
