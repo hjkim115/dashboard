@@ -113,7 +113,7 @@ export default function Header() {
         />
 
         {/* Menu Icon */}
-        {pathName !== '/update/editMenu' ? (
+        {pathName !== '/update/editMenu' && pathName !== '/update/settings' ? (
           <>
             {isOpen ? (
               <FaTimes
