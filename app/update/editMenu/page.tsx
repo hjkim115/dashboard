@@ -229,6 +229,7 @@ export default function menu() {
           defaultValue={newCategory}
           onChange={(e) => setNewCategory(e.target.value.trim())}
         >
+          <option value="">Select Category!</option>
           {categories.map((category) => (
             <option value={category.id}>{category.englishName}</option>
           ))}

@@ -51,28 +51,34 @@ export default function Home() {
   }
 
   if (!(companyName && counts)) {
-    return <LoadingPage />
+    return (
+      <div className="container">
+        <LoadingPage />
+      </div>
+    )
   }
 
   return (
-    <div className={`container ${homeStyles.homeContainer}`}>
-      <h1>
-        Welcome <span className={homeStyles.companyName}>{companyName}!</span>
-      </h1>
+    <div className="container">
+      <div className={homeStyles.homeContainer}>
+        <h1>
+          Welcome <span className={homeStyles.companyName}>{companyName}!</span>
+        </h1>
 
-      {Object.keys(links).map((key, i) => (
-        <div
-          className={homeStyles.menu}
-          onClick={() => router.push(links[key])}
-        >
-          <h2 className={homeStyles.name}>{key}</h2>
-          <p className={homeStyles.count}>Total: {counts[i]}</p>
-          <button>Update</button>
+        {Object.keys(links).map((key, i) => (
+          <div
+            className={homeStyles.menu}
+            onClick={() => router.push(links[key])}
+          >
+            <h2 className={homeStyles.name}>{key}</h2>
+            <p className={homeStyles.count}>Total: {counts[i]}</p>
+            <button>Update</button>
+          </div>
+        ))}
+
+        <div className={homeStyles.footer}>
+          <p>Developed by hjkim</p>
         </div>
-      ))}
-
-      <div className={homeStyles.footer}>
-        <p>Developed by hjkim</p>
       </div>
     </div>
   )

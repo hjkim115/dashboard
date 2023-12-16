@@ -13,8 +13,14 @@ export default function updateLayout({
   const { user } = useContext(AuthContext)
 
   return (
-    <section className="container">
-      {user ? <>{children}</> : user === null ? <LogIn /> : <LoadingPage />}
+    <section>
+      {user ? (
+        <div className="container">{children}</div>
+      ) : user === null ? (
+        <LogIn />
+      ) : (
+        <LoadingPage />
+      )}
     </section>
   )
 }
