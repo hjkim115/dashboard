@@ -11,10 +11,6 @@
   padding: 0.5rem;
 }
 
-.authContainer h1 span {
-  color: gray;
-}
-
 /* Form */
 .form {
   display: flex;

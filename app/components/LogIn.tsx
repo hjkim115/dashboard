@@ -24,9 +24,7 @@ export default function LogIn() {
 
   return (
     <div className={authStyles.authContainer}>
-      <h1>
-        <span>BS2</span> Log In
-      </h1>
+      <h1>Log In</h1>
       <form id="logInForm" onSubmit={handleLogIn} className={authStyles.form}>
         <div>
           <p>Email</p>
