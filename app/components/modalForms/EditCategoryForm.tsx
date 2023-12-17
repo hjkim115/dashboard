@@ -59,7 +59,7 @@ export default function EditCategoryForm({
   }
 
   async function handleDelete() {
-    if (confirm('Are you sure you want to delete this category?')) {
+    if (!confirm('Are you sure you want to delete this category?')) {
       return
     }
 
@@ -125,7 +125,7 @@ export default function EditCategoryForm({
       {/* Buttons */}
       <div className={modalFormStyles.buttons}>
         <button onClick={() => setOpen(false)}>Close</button>
-        {editCategory ? <button onClick={handleDelete}>Delete</button> : null}
+        <button onClick={handleDelete}>Delete</button>
         <button type="submit" form="editCategoryForm" disabled={disabled}>
           Edit
         </button>
