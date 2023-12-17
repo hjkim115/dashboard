@@ -4,18 +4,21 @@ import { useState, useEffect, useContext } from 'react'
 import { Category } from '../../utils/types'
 import { getAllCategories } from '../../utils/firebase'
 import listStyles from '../../styles/list.module.css'
-import { FaPencilAlt, FaPlus } from 'react-icons/fa'
+import { FaPencilAlt, FaPlus, FaArrowLeft } from 'react-icons/fa'
 import Modal from '../../components/Modal'
 import LoadingPage from '../../components/LoadingPage'
 import { AuthContext } from '@/app/context/AuthContext'
 import AddCategoryForm from '@/app/components/modalForms/AddCategoryForm'
 import EditCategoryForm from '@/app/components/modalForms/EditCategoryForm'
+import { useRouter } from 'next/navigation'
 
 export default function Categories() {
   const [categories, setCategories] = useState<Category[] | null>(null)
 
   const { user } = useContext(AuthContext)
   const store = user?.displayName
+
+  const router = useRouter()
 
   //Edit
   const [editOpen, setEditOpen] = useState(false)
@@ -66,6 +69,11 @@ export default function Categories() {
       {/* Add Category */}
       <button className="addButton" onClick={() => setAddOpen(true)}>
         <FaPlus /> Add Category
+      </button>
+
+      {/* Back To Home */}
+      <button className="goBackButton" onClick={() => router.push('/')}>
+        <FaArrowLeft /> Back To Home
       </button>
 
       {/* Modals */}

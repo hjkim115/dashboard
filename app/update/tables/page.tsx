@@ -4,18 +4,21 @@ import listStyles from '../../styles/list.module.css'
 import { useState, useEffect, useContext } from 'react'
 import { Table } from '../../utils/types'
 import { getAllTables } from '../../utils/firebase'
-import { FaPencilAlt, FaPlus } from 'react-icons/fa'
+import { FaPencilAlt, FaPlus, FaArrowLeft } from 'react-icons/fa'
 import Modal from '../../components/Modal'
 import LoadingPage from '../../components/LoadingPage'
 import { AuthContext } from '@/app/context/AuthContext'
 import AddTableForm from '@/app/components/modalForms/AddTableForm'
 import EditTableForm from '@/app/components/modalForms/EditTableForm'
+import { useRouter } from 'next/navigation'
 
 export default function Tables() {
   const [tables, setTables] = useState<Table[] | null>(null)
 
   const { user } = useContext(AuthContext)
   const store = user?.displayName
+
+  const router = useRouter()
 
   //Edit
   const [editOpen, setEditOpen] = useState(false)
@@ -66,6 +69,11 @@ export default function Tables() {
       {/* Add Table */}
       <button className="addButton" onClick={() => setAddOpen(true)}>
         <FaPlus /> Add Table
+      </button>
+
+      {/* Back To Home */}
+      <button className="goBackButton" onClick={() => router.push('/')}>
+        <FaArrowLeft /> Back To Home
       </button>
 
       {/* Modals */}

@@ -5,7 +5,7 @@ import { Category, Menu } from '../../utils/types'
 import { getAllCategories, getAllMenus } from '../../utils/firebase'
 import menusStyles from '../../styles/menus.module.css'
 import listStyles from '../../styles/list.module.css'
-import { FaPencilAlt, FaPlus } from 'react-icons/fa'
+import { FaPencilAlt, FaPlus, FaArrowLeft } from 'react-icons/fa'
 import Modal from '../../components/Modal'
 import { useRouter } from 'next/navigation'
 import LoadingPage from '../../components/LoadingPage'
@@ -116,6 +116,11 @@ export default function Menus() {
       {/* Add Menu */}
       <button className="addButton" onClick={() => setAddOpen(true)}>
         <FaPlus /> Add Menu
+      </button>
+
+      {/* Back To Home */}
+      <button className="goBackButton" onClick={() => router.push('/')}>
+        <FaArrowLeft /> Back To Home
       </button>
 
       {/* Add Modal */}
