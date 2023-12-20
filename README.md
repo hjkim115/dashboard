@@ -31,7 +31,7 @@ This website is CMS (Content Management System) for food ordering websites. Usin
 
 ### Categories
 
-![Categories](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/menus.png)
+![Categories](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/categories.png)
 
 - Users can filter menus by category using the scroll buttons at the top of the 'menus' page.
 - When users select menu they want, they will be taken to the page, where they can select options and quantity and add to cart.
@@ -39,11 +39,19 @@ This website is CMS (Content Management System) for food ordering websites. Usin
 
 ### Menus
 
-![Menus](https://github.com/hjkim115/qr-order2/blob/main/public/readMeImage/cart.png)
+![Menus](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/menus.png)
 
 - On the 'cart' page, users can delete or change the quantity of selected items before placing the order.
 - Once an order is completed, order details are displayed with button that returns to 'home' page.
 
 ### Edit Menu
 
+![Edit Menu](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/editMenu.png)
+
+![Options1](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/options1.png)\
+
+![Options2](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/options2.png)\
+
 ### Tables
+
+![Tables](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/tables.png)
