@@ -24,7 +24,7 @@ This website is CMS (Content Management System) for food ordering websites. Usin
 ![Home](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/home.png)
 
 - Users have to authenticate using their email address and password in order to start using this website.
-- On the 'home' differt types of contents are displayed with count for each one.
+- On the 'home' page different types of contents are displayed with count for each one.
 - Using buttons in the header users can navigate to other pages.
 
 ### Settings
