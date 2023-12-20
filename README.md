@@ -23,33 +23,48 @@ This website is CMS (Content Management System) for food ordering websites. Usin
 
 ![Home](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/home.png)
 
-- On the homepage restaurant's logo and table number are displayed, and users can go to the menus page by clicking the 'order now' button.
+- Users have to authenticate using their email address and password in order to start using this website.
+- On the 'home' differt types of contents are displayed with count for each one.
+- Using buttons in the header users can navigate to other pages.
 
 ### Settings
 
 ![Settings](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/settings.png)
 
+- Users can change company name and logo image that are going to be displayed in food ordering websites.
+
 ### Categories
 
 ![Categories](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/categories.png)
 
-- Users can filter menus by category using the scroll buttons at the top of the 'menus' page.
-- When users select menu they want, they will be taken to the page, where they can select options and quantity and add to cart.
-- Once users have added menu to the cart, they can navigate to the 'cart' page by clicking the cart button at the bottom of the 'menus' page.
+- Users can add a new category by clicking the 'add category' button and submitting a form.
+- Users can edit existing category by clicking the pencil shaped button and submitting a form.
+- Users can delete category by clicking the pencil shaped button and clicking 'delete' button.
 
 ### Menus
 
 ![Menus](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/menus.png)
 
-- On the 'cart' page, users can delete or change the quantity of selected items before placing the order.
-- Once an order is completed, order details are displayed with button that returns to 'home' page.
+- Users can filter menus by category using the filter at the top of the 'menus' page.
+- Users can add a new menu by clicking the 'add menu' button which opens modal form, and submitting the form.
+- By clicking pencil shaped button users can navigate to 'edit menu' page.
 
 ### Edit Menu
 
 ![Edit Menu](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/editMenu.png)
 
-![Options](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/options.png)\
+- Users can change menu data such as name and category by submitting 'edit menu' form.
+- Users can change menu image by clicking 'edit image' button, uploading new image and submitting the form.
+- At the bottom of this page options are displayed.
+
+![Options](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/options.png)
+
+- Users can click on plus shaped button to add and pencil shaped button to edit or delete option categories and options.
 
 ### Tables
 
 ![Tables](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/tables.png)
+
+-Users can add a new table by clicking the 'add table' button and submitting a form.
+-Users can edit existing table by clicking the pencil shaped button and submitting a form.
+-Users can delete table by clicking the pencil shaped button and clicking 'delete' button.
