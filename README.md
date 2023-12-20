@@ -1,34 +1,49 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# CMS for Food Ordering Websites
 
-## Getting Started
+This website is CMS (Content Management System) for food ordering websites. Using this website users can add, update and delete contents for food ordering websites such as tables, menus and food images. This website has responsive user interface supporting both mobile and desktop view.
 
-First, run the development server:
+## URL
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+**Available at:** <a href='https://dashboard-blush-theta.vercel.app/'>https://dashboard-blush-theta.vercel.app/</a>\
+**Test email address:** test@email.com\
+**Test password:** test1234
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Technologies Used
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+![Diagram](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/diagram.png)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- Developed user interface of the website using **Next.js (React.js)** and **TypeScript (JavaScript)**.
+- Developed **API** that provides presigned temporary URL for uploading images to **AWS S3 bucket** using **AWS Modular SDKs**.
+- Connected user interface with **Firestore** cloud database and added user **authentication** features using **Firebase SDK**.
+- Used **AWS S3 bucket** and **Cloudfront CDN** to dynamically serve and update food images.
 
-## Learn More
+## Features
 
-To learn more about Next.js, take a look at the following resources:
+### Home
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+![Home](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/home.png)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- On the homepage restaurant's logo and table number are displayed, and users can go to the menus page by clicking the 'order now' button.
 
-## Deploy on Vercel
+### Settings
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+![Settings](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/settings.png)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Categories
+
+![Categories](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/menus.png)
+
+- Users can filter menus by category using the scroll buttons at the top of the 'menus' page.
+- When users select menu they want, they will be taken to the page, where they can select options and quantity and add to cart.
+- Once users have added menu to the cart, they can navigate to the 'cart' page by clicking the cart button at the bottom of the 'menus' page.
+
+### Menus
+
+![Menus](https://github.com/hjkim115/qr-order2/blob/main/public/readMeImage/cart.png)
+
+- On the 'cart' page, users can delete or change the quantity of selected items before placing the order.
+- Once an order is completed, order details are displayed with button that returns to 'home' page.
+
+### Edit Menu
+
+### Tables
