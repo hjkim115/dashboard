@@ -65,6 +65,6 @@ This website is CMS (Content Management System) for food ordering websites. Usin
 
 ![Tables](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/tables.png)
 
--Users can add a new table by clicking the 'add table' button and submitting a form.
--Users can edit existing table by clicking the pencil shaped button and submitting a form.
--Users can delete table by clicking the pencil shaped button and clicking 'delete' button.
+- Users can add a new table by clicking the 'add table' button and submitting a form.
+- Users can edit existing table by clicking the pencil shaped button and submitting a form.
+- Users can delete table by clicking the pencil shaped button and clicking 'delete' button.
