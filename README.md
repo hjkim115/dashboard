@@ -48,9 +48,7 @@ This website is CMS (Content Management System) for food ordering websites. Usin
 
 ![Edit Menu](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/editMenu.png)
 
-![Options1](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/options1.png)\
-
-![Options2](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/options2.png)\
+![Options](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/options.png)\
 
 ### Tables
 
