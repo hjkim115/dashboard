@@ -44,7 +44,7 @@ export default function EditCategoryForm({
     !englishName ||
     !koreanName ||
     categoryEquals(editCategory, newCategory) ||
-    categoryIdExists(id, categories) ||
+    (editCategory.id !== id && categoryIdExists(id, categories)) ||
     !idPattern.test(id)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

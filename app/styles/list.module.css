@@ -37,6 +37,10 @@
 }
 
 @media (min-width: 800px) {
+  .listContainer {
+    padding-top: 0;
+  }
+
   .label {
     width: 70%;
   }

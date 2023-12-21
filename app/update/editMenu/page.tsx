@@ -125,7 +125,7 @@ export default function menu() {
       koreanName: newKoreanName,
       englishName: newEnglishName,
       price: Number(newPrice),
-      description: newDescription ? newDescription : undefined,
+      description: newDescription,
       imageName: menu.imageName,
     }
 

@@ -33,7 +33,7 @@ export default function EditTableForm({
     !id ||
     !tableNumber ||
     tableEquals(editTable, { id: id, tableNumber: tableNumber }) ||
-    tableIdExists(id, tables)
+    (editTable.id !== id && tableIdExists(id, tables))
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

@@ -48,8 +48,9 @@ export default function EditOptionForm({
     !koreanName ||
     !price ||
     !isPriceValid(price) ||
-    optionExists(editOption.category, optionId, options) ||
-    optionEquals(editOption, newOption)
+    optionEquals(editOption, newOption) ||
+    (editOption.id !== optionId &&
+      optionExists(editOption.category, optionId, options))
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

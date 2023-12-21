@@ -78,11 +78,10 @@ export default function AddMenuForm({
       koreanName: koreanName,
       englishName: englishName,
       price: Number(price),
+      description: description,
       imageName: `${category}-${id}.${typeToExtensions[image.type]}`,
     }
-    if (description !== '') {
-      menu.description = description
-    }
+
     await postMenu(store, menu)
 
     const newMenus = await getAllMenus(store)
@@ -109,17 +108,17 @@ export default function AddMenuForm({
             <option value={category.id}>{category.englishName}</option>
           ))}
         </select>
-        <p>Korean Name*</p>
-        <input
-          onChange={(e) => setKoreanName(e.target.value.trim())}
-          type="text"
-          placeholder="Korean Name"
-        />
         <p>English Name*</p>
         <input
           onChange={(e) => setEnglishName(e.target.value.trim())}
           type="text"
           placeholder="English Name"
+        />
+        <p>Korean Name*</p>
+        <input
+          onChange={(e) => setKoreanName(e.target.value.trim())}
+          type="text"
+          placeholder="Korean Name"
         />
         <p>Price*</p>
         <input

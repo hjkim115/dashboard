@@ -24,9 +24,9 @@ export default function AddCategoryForm({
   const [koreanName, setKoreanName] = useState('')
 
   const disabled =
-    id === '' ||
-    englishName === '' ||
-    koreanName === '' ||
+    !id ||
+    !englishName ||
+    !koreanName ||
     categoryIdExists(id, categories) ||
     !idPattern.test(id)
 
