@@ -13,7 +13,7 @@ This website is CMS (Content Management System) for food ordering websites. Usin
 ![Diagram](https://github.com/hjkim115/dashboard/blob/main/public/readMeImage/diagram.png)
 
 - Developed user interface of the website using **Next.js (React.js)** and **TypeScript (JavaScript)**.
-- Developed **API** that provides presigned temporary URL for uploading images to **AWS S3 bucket** using **AWS Modular SDKs**.
+- Developed **API** that provides presigned temporary URL for uploading images to **AWS S3 bucket** using **Next.js API routes** and **AWS Modular SDKs**.
 - Connected user interface with **Firestore** cloud database and added user **authentication** features using **Firebase SDK**.
 - Used **AWS S3 bucket** and **Cloudfront CDN** to dynamically serve and update food images.
 
