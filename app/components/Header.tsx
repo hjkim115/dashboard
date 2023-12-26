@@ -54,7 +54,7 @@ export default function Header() {
       <div className={headerStyles.logoImage}>
         <div
           style={{
-            backgroundImage: `url('${process.env.NEXT_PUBLIC_CLOUD_FRONT_URL}/${store}/${logoImageName}')`,
+            backgroundImage: `url('${process.env.NEXT_PUBLIC_CLOUD_FRONT_URL}/${store}/${logoImageName}++++')`,
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
