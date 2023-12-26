@@ -71,7 +71,7 @@ export default function EditImageForm({
             process.env.NEXT_PUBLIC_CLOUD_FRONT_URL
           }/${store}/${
             type === 'menu' ? menu.imageName : settings.logoImageName
-          }')`,
+          }++++')`,
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'contain',
