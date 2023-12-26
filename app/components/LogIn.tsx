@@ -44,6 +44,12 @@ export default function LogIn() {
         </div>
         {error ? <p style={{ color: 'red' }}>{error}</p> : null}
       </form>
+      <div className={authStyles.forTesting}>
+        <h2>For Testing</h2>
+        <p>Email: test@email.com</p>
+        <p>Password: test1234</p>
+      </div>
+
       <button type="submit" form="logInForm">
         Log In
       </button>
