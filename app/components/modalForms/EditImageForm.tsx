@@ -37,27 +37,20 @@ export default function EditImageForm({
     image: File
   ) {
     e.preventDefault()
-
-    alert(
-      'It may take sometime for image to be updated as it still remains in the cache!'
-    )
     setOpen(false)
 
-    if (type === 'settings') {
-      const fileName = `logo.${typeToExtensions[image.type]}`
-      await uploadImage(store, fileName, image)
+    const fileName = `${crypto.randomUUID().replaceAll('-', '')}.${
+      typeToExtensions[image.type]
+    }`
+    await uploadImage(store, fileName, image)
 
+    if (type === 'settings') {
       const newSettings = { ...settings }
       newSettings.logoImageName = fileName
       await updateSettings(store, newSettings)
 
       setSettings(await getSettings(store))
     } else {
-      const fileName = `${menu.category}-${menu.id}.${
-        typeToExtensions[image.type]
-      }`
-      await uploadImage(store, fileName, image)
-
       const newMenu = { ...menu }
       newMenu.imageName = fileName
       await updateMenu(store, menu.id, menu.category, newMenu)

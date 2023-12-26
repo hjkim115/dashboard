@@ -8,6 +8,7 @@ import {
   idPattern,
   isPriceValid,
   typeToExtensions,
+  uploadImage,
 } from '@/app/utils/formUtils'
 import { server } from '../../utils/config'
 import { postMenu, getAllMenus } from '@/app/utils/firebase'
@@ -53,23 +54,12 @@ export default function AddMenuForm({
     e.preventDefault()
     setOpen(false)
 
-    //Get Presigned Upload url
-    const uploadUrlRes = await fetch(
-      `${server}/api/uploadUrl?fileName=${category}-${id}.${
-        typeToExtensions[image.type]
-      }&store=${store}`
-    )
-    const uploadUrl = await uploadUrlRes.json()
+    const fileName = `${crypto.randomUUID().replaceAll('-', '')}.${
+      typeToExtensions[image.type]
+    }`
 
     //Upload Image
-    await fetch(uploadUrl, {
-      method: 'PUT',
-      body: image,
-      headers: {
-        'Content-Type': image?.type,
-        'Content-Length': image?.size.toString(),
-      },
-    })
+    await uploadImage(store, fileName, image)
 
     //Add Menu
     const menu: Menu = {
@@ -79,7 +69,7 @@ export default function AddMenuForm({
       englishName: englishName,
       price: Number(price),
       description: description,
-      imageName: `${category}-${id}.${typeToExtensions[image.type]}`,
+      imageName: fileName,
     }
 
     await postMenu(store, menu)
